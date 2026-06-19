@@ -1,7 +1,362 @@
-﻿<!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz Matemáticas con Gemini</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+            text-align: center;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .question-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        .question-text {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        .question-text .number {
+            color: #667eea;
+            margin-right: 8px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .feedback {
+            margin-top: 10px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+        .feedback.correct {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .feedback.incorrect {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .feedback.loading {
+            display: block;
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffc107;
+        }
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        button {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 120px;
+        }
+        .btn-check {
+            background: #667eea;
+            color: white;
+        }
+        .btn-check:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .btn-new {
+            background: #48bb78;
+            color: white;
+        }
+        .btn-new:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+        }
+        .btn-check:disabled, .btn-new:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        .score {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f4ff;
+            border-radius: 10px;
+            font-weight: 600;
+            color: #333;
+        }
+        .score span {
+            color: #667eea;
+            font-size: 20px;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
 <body>
-    <h1>Bienvenido al curso de Termodinamica</h1>
-    <p>Haz clic para ir a la <a href="A/0-ley.html">Primera lección</a></p>
+    <div class="container">
+        <h1>🧮 Quiz Matemático</h1>
+        <p class="subtitle">Responde las 5 preguntas generadas por IA (Gemini)</p>
+
+        <div id="questionsContainer">
+            <div style="text-align:center;padding:40px;">⏳ Cargando preguntas...</div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-check" id="checkBtn" disabled>✅ Revisar respuestas</button>
+            <button class="btn-new" id="newBtn">🔄 Nuevas preguntas</button>
+        </div>
+
+        <div class="score">
+            Puntaje: <span id="scoreValue">0</span> / 5
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURACIÓN - Usa la API de Gemini
+        // ============================================
+        let questions = [];
+        let userAnswers = [];
+        let feedbacks = [];
+        let isChecking = false;
+
+        // ============================================
+        // FUNCIONES PARA LLAMAR AL BACKEND
+        // ============================================
+
+        async function generateQuestions() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '<div style="text-align:center;padding:40px;">⏳ Generando preguntas con IA...</div>';
+            
+            try {
+                const response = await fetch('/api/gemini', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'generate'
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Error al generar preguntas');
+                }
+
+                const data = await response.json();
+                
+                if (!data.questions || !Array.isArray(data.questions) || data.questions.length !== 5) {
+                    throw new Error('El formato de la respuesta no es válido');
+                }
+
+                questions = data.questions;
+                userAnswers = new Array(5).fill('');
+                feedbacks = new Array(5).fill(null);
+                renderQuestions();
+                updateScore();
+                document.getElementById('checkBtn').disabled = false;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                container.innerHTML = `
+                    <div style="background:#f8d7da;padding:20px;border-radius:10px;color:#721c24;">
+                        ❌ Error al generar preguntas: ${error.message}<br><br>
+                        <button onclick="generateQuestions()" style="padding:10px 20px;background:#667eea;color:white;border:none;border-radius:8px;cursor:pointer;">
+                            🔄 Intentar de nuevo
+                        </button>
+                    </div>
+                `;
+                document.getElementById('checkBtn').disabled = true;
+            }
+        }
+
+        async function checkAnswers() {
+            if (isChecking) return;
+            
+            const emptyAnswers = userAnswers.some(ans => !ans);
+            if (emptyAnswers) {
+                alert('⚠️ Por favor, responde todas las preguntas antes de revisar.');
+                return;
+            }
+
+            isChecking = true;
+            document.getElementById('checkBtn').disabled = true;
+            
+            for (let i = 0; i < 5; i++) {
+                const feedbackEl = document.getElementById(`feedback-${i}`);
+                feedbackEl.className = 'feedback loading';
+                feedbackEl.innerHTML = '<span class="loading-spinner"></span> Revisando con IA...';
+                feedbackEl.style.display = 'block';
+            }
+
+            try {
+                const response = await fetch('/api/gemini', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'check',
+                        questions: questions,
+                        answers: userAnswers
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Error al revisar respuestas');
+                }
+
+                const data = await response.json();
+                
+                if (!data.results || !Array.isArray(data.results) || data.results.length !== 5) {
+                    throw new Error('El formato de la respuesta no es válido');
+                }
+
+                let correctCount = 0;
+                for (let i = 0; i < 5; i++) {
+                    const result = data.results[i];
+                    feedbacks[i] = {
+                        correct: result.correct,
+                        text: result.feedback
+                    };
+                    if (result.correct) correctCount++;
+                    
+                    const feedbackEl = document.getElementById(`feedback-${i}`);
+                    feedbackEl.className = `feedback ${result.correct ? 'correct' : 'incorrect'}`;
+                    feedbackEl.innerHTML = `${result.correct ? '✅' : '❌'} ${result.feedback}`;
+                    feedbackEl.style.display = 'block';
+                }
+
+                document.getElementById('scoreValue').textContent = correctCount;
+                document.getElementById('checkBtn').disabled = false;
+                isChecking = false;
+
+            } catch (error) {
+                console.error('Error:', error);
+                for (let i = 0; i < 5; i++) {
+                    const feedbackEl = document.getElementById(`feedback-${i}`);
+                    feedbackEl.className = 'feedback incorrect';
+                    feedbackEl.innerHTML = `❌ Error al revisar: ${error.message}`;
+                    feedbackEl.style.display = 'block';
+                }
+                document.getElementById('checkBtn').disabled = false;
+                isChecking = false;
+            }
+        }
+
+        function renderQuestions() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = questions.map((q, index) => `
+                <div class="question-item">
+                    <div class="question-text">
+                        <span class="number">${index + 1}.</span> ${q.question}
+                    </div>
+                    <input type="text" 
+                           id="answer-${index}" 
+                           placeholder="Escribe tu respuesta..." 
+                           value="${userAnswers[index] || ''}"
+                           onchange="updateAnswer(${index}, this.value)"
+                           onkeypress="if(event.key==='Enter') checkAnswers()">
+                    <div class="feedback" id="feedback-${index}">
+                        ${feedbacks[index] ? (feedbacks[index].correct ? '✅' : '❌') + ' ' + feedbacks[index].text : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateAnswer(index, value) {
+            userAnswers[index] = value.trim();
+        }
+
+        function updateScore() {
+            const correctCount = feedbacks.filter(f => f && f.correct).length;
+            document.getElementById('scoreValue').textContent = correctCount;
+        }
+
+        document.getElementById('checkBtn').addEventListener('click', checkAnswers);
+        document.getElementById('newBtn').addEventListener('click', () => {
+            questions = [];
+            userAnswers = [];
+            feedbacks = [];
+            document.getElementById('scoreValue').textContent = '0';
+            document.getElementById('checkBtn').disabled = true;
+            generateQuestions();
+        });
+
+        window.updateAnswer = updateAnswer;
+        window.checkAnswers = checkAnswers;
+        window.generateQuestions = generateQuestions;
+
+        generateQuestions();
+    </script>
 </body>
 </html>
