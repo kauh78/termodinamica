@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quiz Matemáticas con Gemini</title>
+    <title>Quiz Matemáticas con IA</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -162,15 +162,15 @@
 <body>
     <div class="container">
         <h1>🧮 Quiz Matemático</h1>
-        <p class="subtitle">Responde las 5 preguntas generadas por IA (Gemini)</p>
+        <p class="subtitle">Responde las 5 preguntas y la IA corregirá tus respuestas</p>
 
         <div id="questionsContainer">
-            <div style="text-align:center;padding:40px;">⏳ Cargando preguntas...</div>
+            <!-- Las preguntas se generarán aquí -->
         </div>
 
         <div class="button-group">
-            <button class="btn-check" id="checkBtn" disabled>✅ Revisar respuestas</button>
-            <button class="btn-new" id="newBtn">🔄 Nuevas preguntas</button>
+            <button class="btn-check" id="checkBtn">✅ Revisar respuestas</button>
+            <button class="btn-new" id="newBtn">🔄 Reiniciar</button>
         </div>
 
         <div class="score">
@@ -180,7 +180,18 @@
 
     <script>
         // ============================================
-        // CONFIGURACIÓN - Usa la API de Gemini
+        // PREGUNTAS FIJAS (sin IA)
+        // ============================================
+        const FIXED_QUESTIONS = [
+            { id: 1, question: "¿Cuánto es 5 + 3?", answer: "8" },
+            { id: 2, question: "¿Cuánto es 12 - 7?", answer: "5" },
+            { id: 3, question: "¿Cuánto es 4 x 6?", answer: "24" },
+            { id: 4, question: "¿Cuánto es 15 ÷ 3?", answer: "5" },
+            { id: 5, question: "Si tengo 10 manzanas y como 3, ¿cuántas me quedan?", answer: "7" }
+        ];
+
+        // ============================================
+        // ESTADO DE LA APLICACIÓN
         // ============================================
         let questions = [];
         let userAnswers = [];
@@ -188,59 +199,58 @@
         let isChecking = false;
 
         // ============================================
-        // FUNCIONES PARA LLAMAR AL BACKEND
+        // FUNCIONES
         // ============================================
 
-        async function generateQuestions() {
-            const container = document.getElementById('questionsContainer');
-            container.innerHTML = '<div style="text-align:center;padding:40px;">⏳ Generando preguntas con IA...</div>';
-            
-            try {
-                const response = await fetch('/api/gemini', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        action: 'generate'
-                    })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Error al generar preguntas');
-                }
-
-                const data = await response.json();
-                
-                if (!data.questions || !Array.isArray(data.questions) || data.questions.length !== 5) {
-                    throw new Error('El formato de la respuesta no es válido');
-                }
-
-                questions = data.questions;
-                userAnswers = new Array(5).fill('');
-                feedbacks = new Array(5).fill(null);
-                renderQuestions();
-                updateScore();
-                document.getElementById('checkBtn').disabled = false;
-                
-            } catch (error) {
-                console.error('Error:', error);
-                container.innerHTML = `
-                    <div style="background:#f8d7da;padding:20px;border-radius:10px;color:#721c24;">
-                        ❌ Error al generar preguntas: ${error.message}<br><br>
-                        <button onclick="generateQuestions()" style="padding:10px 20px;background:#667eea;color:white;border:none;border-radius:8px;cursor:pointer;">
-                            🔄 Intentar de nuevo
-                        </button>
-                    </div>
-                `;
-                document.getElementById('checkBtn').disabled = true;
-            }
+        // Cargar preguntas fijas
+        function loadQuestions() {
+            questions = JSON.parse(JSON.stringify(FIXED_QUESTIONS)); // Copia profunda
+            userAnswers = new Array(5).fill('');
+            feedbacks = new Array(5).fill(null);
+            renderQuestions();
+            updateScore();
+            document.getElementById('checkBtn').disabled = false;
         }
 
+        // Renderizar preguntas
+        function renderQuestions() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = questions.map((q, index) => `
+                <div class="question-item">
+                    <div class="question-text">
+                        <span class="number">${index + 1}.</span> ${q.question}
+                    </div>
+                    <input type="text" 
+                           id="answer-${index}" 
+                           placeholder="Escribe tu respuesta..." 
+                           value="${userAnswers[index] || ''}"
+                           onchange="updateAnswer(${index}, this.value)"
+                           onkeypress="if(event.key==='Enter') checkAnswers()">
+                    <div class="feedback" id="feedback-${index}">
+                        ${feedbacks[index] ? (feedbacks[index].correct ? '✅' : '❌') + ' ' + feedbacks[index].text : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Actualizar respuesta del usuario
+        function updateAnswer(index, value) {
+            userAnswers[index] = value.trim();
+        }
+
+        // Actualizar puntaje
+        function updateScore() {
+            const correctCount = feedbacks.filter(f => f && f.correct).length;
+            document.getElementById('scoreValue').textContent = correctCount;
+        }
+
+        // ============================================
+        // CORREGIR RESPUESTAS CON IA (npmai)
+        // ============================================
         async function checkAnswers() {
             if (isChecking) return;
             
+            // Verificar que todas las preguntas tengan respuesta
             const emptyAnswers = userAnswers.some(ans => !ans);
             if (emptyAnswers) {
                 alert('⚠️ Por favor, responde todas las preguntas antes de revisar.');
@@ -250,6 +260,7 @@
             isChecking = true;
             document.getElementById('checkBtn').disabled = true;
             
+            // Mostrar estado de carga
             for (let i = 0; i < 5; i++) {
                 const feedbackEl = document.getElementById(`feedback-${i}`);
                 feedbackEl.className = 'feedback loading';
@@ -258,6 +269,7 @@
             }
 
             try {
+                // Llamar al backend de npmai
                 const response = await fetch('/api/npmai', {
                     method: 'POST',
                     headers: {
@@ -281,6 +293,7 @@
                     throw new Error('El formato de la respuesta no es válido');
                 }
 
+                // Actualizar feedbacks y puntaje
                 let correctCount = 0;
                 for (let i = 0; i < 5; i++) {
                     const result = data.results[i];
@@ -313,50 +326,45 @@
             }
         }
 
-        function renderQuestions() {
-            const container = document.getElementById('questionsContainer');
-            container.innerHTML = questions.map((q, index) => `
-                <div class="question-item">
-                    <div class="question-text">
-                        <span class="number">${index + 1}.</span> ${q.question}
-                    </div>
-                    <input type="text" 
-                           id="answer-${index}" 
-                           placeholder="Escribe tu respuesta..." 
-                           value="${userAnswers[index] || ''}"
-                           onchange="updateAnswer(${index}, this.value)"
-                           onkeypress="if(event.key==='Enter') checkAnswers()">
-                    <div class="feedback" id="feedback-${index}">
-                        ${feedbacks[index] ? (feedbacks[index].correct ? '✅' : '❌') + ' ' + feedbacks[index].text : ''}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function updateAnswer(index, value) {
-            userAnswers[index] = value.trim();
-        }
-
-        function updateScore() {
-            const correctCount = feedbacks.filter(f => f && f.correct).length;
-            document.getElementById('scoreValue').textContent = correctCount;
-        }
-
-        document.getElementById('checkBtn').addEventListener('click', checkAnswers);
-        document.getElementById('newBtn').addEventListener('click', () => {
-            questions = [];
-            userAnswers = [];
-            feedbacks = [];
+        // ============================================
+        // REINICIAR (mismas preguntas)
+        // ============================================
+        function resetQuiz() {
+            userAnswers = new Array(5).fill('');
+            feedbacks = new Array(5).fill(null);
             document.getElementById('scoreValue').textContent = '0';
-            document.getElementById('checkBtn').disabled = true;
-            generateQuestions();
-        });
+            document.getElementById('checkBtn').disabled = false;
+            
+            // Limpiar feedbacks
+            for (let i = 0; i < 5; i++) {
+                const feedbackEl = document.getElementById(`feedback-${i}`);
+                if (feedbackEl) {
+                    feedbackEl.className = 'feedback';
+                    feedbackEl.innerHTML = '';
+                    feedbackEl.style.display = 'none';
+                }
+                const input = document.getElementById(`answer-${i}`);
+                if (input) input.value = '';
+            }
+            
+            renderQuestions();
+            updateScore();
+        }
 
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+        document.getElementById('checkBtn').addEventListener('click', checkAnswers);
+        document.getElementById('newBtn').addEventListener('click', resetQuiz);
+
+        // Hacer accesibles las funciones globalmente
         window.updateAnswer = updateAnswer;
         window.checkAnswers = checkAnswers;
-        window.generateQuestions = generateQuestions;
 
-        generateQuestions();
+        // ============================================
+        // INICIAR APLICACIÓN
+        // ============================================
+        loadQuestions();
     </script>
 </body>
 </html>
