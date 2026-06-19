@@ -1,4 +1,4 @@
-// api/npmai.js - Backend para usar npmai
+// api/npmai.js - Backend para usar npmai (corrección de respuestas)
 
 export default async function handler(req, res) {
     // Solo permitir el método POST
@@ -7,14 +7,10 @@ export default async function handler(req, res) {
     }
 
     try {
-        // 1. Extraer la acción y los datos del cuerpo de la petición
-        //    El frontend enviará algo como: { action: 'check', questions: [...], answers: [...] }
         const { action, questions, answers } = req.body;
-
-        // 2. Definir la URL de la API de npmai
         const NPM_API_URL = 'https://npmai-api.onrender.com';
 
-        // 3. Manejar la acción de CORREGIR RESPUESTAS
+        // ACCIÓN: Corregir respuestas
         if (action === 'check') {
             if (!questions || !answers || !Array.isArray(questions) || !Array.isArray(answers)) {
                 return res.status(400).json({ error: 'Datos incompletos' });
@@ -38,7 +34,7 @@ export default async function handler(req, res) {
             Preguntas y respuestas:
             ${questionsText}`;
 
-            // Hacer la llamada a npmai
+            // Llamar a npmai
             const response = await fetch(NPM_API_URL, {
                 method: 'POST',
                 headers: {
@@ -46,7 +42,7 @@ export default async function handler(req, res) {
                 },
                 body: JSON.stringify({
                     prompt: prompt,
-                    model: "llama3.2",  // Puedes cambiar el modelo. "llama3.2" es muy rápido.
+                    model: "llama3.2",
                     temperature: 0.3
                 })
             });
@@ -58,14 +54,11 @@ export default async function handler(req, res) {
 
             const data = await response.json();
 
-            // ¡IMPORTANTE! La respuesta de npmai viene en data.response [citation:3][citation:4].
-            // Debemos procesar ese texto para extraer el JSON con los resultados.
+            // Procesar la respuesta de npmai
             let resultsData;
             try {
-                // Intentamos parsear directamente, por si la IA obedece al pie de la letra.
                 resultsData = JSON.parse(data.response);
             } catch (parseError) {
-                // Si falla, intentamos extraer el JSON del texto (a veces la IA añade contexto).
                 const jsonMatch = data.response.match(/\{[\s\S]*\}/);
                 if (!jsonMatch) throw new Error('No se encontró JSON en la respuesta de npmai');
                 resultsData = JSON.parse(jsonMatch[0]);
@@ -75,11 +68,9 @@ export default async function handler(req, res) {
                 throw new Error('El formato de la respuesta de npmai no es válido');
             }
 
-            // Devolver los resultados al frontend
             return res.status(200).json(resultsData);
 
         } else {
-            // Si se pide una acción que no sea 'check'
             return res.status(400).json({ error: 'Acción no válida' });
         }
 
