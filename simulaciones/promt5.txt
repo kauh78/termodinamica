@@ -1,0 +1,21 @@
+﻿Actúa como un Ingeniero Mecánico experto en Didáctica y Desarrollador Frontend Senior. Requiero que generes el código completo y unificado de un simulador cinemático interactivo en un solo archivo ".html" basado en web para el mecanismo: "Leva Circular con Seguidor de Rodillo de Brazo Oscilante / Pivotado".
+
+El diseño debe cumplir estrictamente con los siguientes requisitos estructurales, matemáticos y estéticos:
+
+1. ARQUITECTURA DE LA INTERFAZ (HTML/CSS):
+- Diseño responsivo de tipo Consola HMI de Laboratorio. Fondo general con un degradado gris carbón oscuro (#111827 a #1f2937).
+- Área gráfica en el centro de la interfaz. Panel de configuración paramétrica a la derecha (#1f2937) con etiquetas en ámbar de alta visibilidad (#fbbf24).
+- Los deslizadores deben cambiar los radios de la leva, excentricidad y longitud del brazo pivotado en tiempo real. Cada control debe mostrar su valor numérico en un elemento <span> de color ámbar (#fbbf24).
+- Los botones de control operativo ("Iniciar", "Pausar", "Reset") deben estar desacoplados del panel de control, ubicados estratégicamente alineados al fondo de la pantalla en una barra de comandos horizontal inferior, usando colores de código industrial (Verde marcha #10b981, Rojo parada #dc2626).
+
+2. ÁREA GRÁFICA (SVG):
+- Lienzo SVG con 'viewBox' equilibrado (0 0 800 500) y un fondo interno negro mate (#0d1117).
+- Definición de componentes móviles por clases CSS: Perfil rotativo de la leva en color coral (#f43f5e), el brazo oscilante seguidor en verde esmeralda (#10b981), y el rodillo palpable en azul cian (#38bdf8). El eje de pivote fijo del brazo debe marcarse claramente con un soporte triangular de bancada.
+- Integra un "Panel de Telemetría Dinámica" interno en el SVG (un <rect> oscuro con opacidad 0.9) ubicado estratégicamente. Este cuadro debe mostrar etiquetas claras y valores de texto dinámicos con fuentes monoespaciadas para desplegar variables como ángulo de la leva, ángulo de oscilación del seguidor en grados y el ángulo de presión instantáneo.
+
+3. SCRIPT CINEMÁTICO (JAVASCRIPT):
+- Desarrollar un lazo de animación continuo basado en 'requestAnimationFrame' controlado por una variable booleana de ejecución.
+- ¡CRÍTICO PARA LA RIGIDEZ MECÁNICA!: No utilices transformaciones de rotación gráficas independientes ('transform="rotate(...)"'). En su lugar, calcula trigonométricamente mediante la intersección de circunferencias y teoremas vectoriales las coordenadas absolutas (X, Y) de la articulación del rodillo y el centro de la leva en cada cuadro basándote en el avance angular. Redibuja de forma síncrona los atributos geométricos ('x1', 'y1', 'x2', 'y2', 'cx', 'cy') utilizando estrictamente las mismas variables calculadas en memoria.
+- Aplica candados lógicos o restricciones geométricas en los deslizadores para evitar que la leva se desvincule físicamente del rodillo del seguidor o genere bloqueos geométricos.
+
+Entrégame únicamente el código completo, limpio y estructurado dentro de un solo bloque de código unificado, listo para guardar como archivo .html y ejecutar directamente en el navegador.

@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propiedades Intensivas y Extensivas | Termodinámica</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ==========================================
+           PERSONALIZACIÓN DE COLORES
+           Modifica estos valores para cambiar el tema
+           ========================================== */
+        
+        /* COLOR DE FONDO */
+        :root {
+            --bg-primary: #f0f4f8;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-highlight: #e0f2fe;
+            
+            /* COLOR DE TÍTULOS */
+            --color-titles: #1e293b;
+            --color-subtitles: #475569;
+            
+            /* COLOR DE LETRA */
+            --color-text: #334155;
+            --color-text-light: #64748b;
+            
+            /* COLOR DE BOTONES */
+            --btn-primary: #3b82f6;
+            --btn-primary-hover: #2563eb;
+            --btn-secondary: #10b981;
+            --btn-secondary-hover: #059669;
+            
+            /* COLORES DE ÉNFASIS */
+            --accent-color: #0ea5e9;
+            --warning-color: #f59e0b;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            
+            /* SOMBRAS Y BORDES */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --border-radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--color-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ==========================================
+           HEADER Y TÍTULO PRINCIPAL
+           ========================================== */
+        .hero {
+            background: linear-gradient(135deg, var(--btn-primary) 0%, var(--accent-color) 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.3;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .hero p {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            max-width: 800px;
+            margin: 0 auto;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ==========================================
+           CONTENEDOR PRINCIPAL
+           ========================================== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+        }
+
+        /* ==========================================
+           GRID DE TARJETAS
+           ========================================== */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 2rem;
+        }
+
+        .card h2 {
+            color: var(--color-titles);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .card p {
+            color: var(--color-text);
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        .card a {
+            color: var(--btn-primary);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            transition: color 0.2s;
+        }
+
+        .card a:hover {
+            color: var(--btn-primary-hover);
+            text-decoration: underline;
+        }
+
+        /* ==========================================
+           COMPARACIÓN CON FENÓMENO NATURAL
+           ========================================== */
+        .nature-comparison {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-left: 5px solid var(--success-color);
+            padding: 1.5rem;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            margin: 1.5rem 0;
+        }
+
+        .nature-comparison h3 {
+            color: var(--color-titles);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nature-comparison p {
+            color: var(--color-text);
+            margin: 0;
+        }
+
+        /* ==========================================
+           DETALLE TÉCNICO
+           ========================================== */
+        .tech-detail {
+            background: var(--bg-highlight);
+            border: 2px solid var(--accent-color);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .tech-detail h4 {
+            color: var(--accent-color);
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tech-detail p {
+            color: var(--color-text);
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+        }
+
+        /* ==========================================
+           CURIOSIDADES
+           ========================================== */
+        .curiosity {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: var(--border-radius);
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            font-style: italic;
+            color: var(--color-text);
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .curiosity::before {
+            content: "💡";
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        /* ==========================================
+           SECCIÓN DE REFLEXIÓN
+           ========================================== */
+        .reflection {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            margin: 3rem 0;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .reflection::before {
+            content: '"';
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            font-size: 150px;
+            opacity: 0.1;
+            font-family: Georgia, serif;
+        }
+
+        .reflection h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .reflection p {
+            font-size: 1.25rem;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.8;
+            opacity: 0.95;
+        }
+
+        /* ==========================================
+           ZONA DE PREGUNTAS IA
+           ========================================== */
+        .qa-section {
+            background: var(--bg-secondary);
+            padding: 3rem 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            margin: 3rem 0;
+        }
+
+        .qa-section > h2 {
+            color: var(--color-titles);
+            margin-bottom: 2rem;
+            text-align: center;
+            font-size: 2rem;
+        }
+
+        .question-bank {
+            display: grid;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .question-item {
+            background: var(--bg-primary);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--btn-primary);
+        }
+
+        .question-item h3 {
+            color: var(--color-titles);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .question-item > p {
+            color: var(--color-text);
+            margin: 0;
+        }
+
+        /* ==========================================
+           🆕 ÁREA DE RESPUESTA PARA CADA PREGUNTA
+           ========================================== */
+        .answer-box {
+            margin-top: 1rem;
+            background: white;
+            border: 2px dashed #cbd5e1;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .answer-box:focus-within {
+            border-color: var(--btn-primary);
+            border-style: solid;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .answer-box-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--color-subtitles);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .answer-box-label::before {
+            content: "✏️";
+        }
+
+        .answer-input {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.75rem;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            resize: vertical;
+            color: var(--color-text);
+            background: transparent;
+        }
+
+        .answer-input:focus {
+            outline: none;
+        }
+
+        .answer-input::placeholder {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        .btn-show-answer {
+            margin-top: 0.75rem;
+            padding: 0.5rem 1rem;
+            background: transparent;
+            color: var(--btn-primary);
+            border: 2px solid var(--btn-primary);
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-show-answer:hover {
+            background: var(--btn-primary);
+            color: white;
+        }
+
+        .model-answer {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-left: 4px solid var(--btn-primary);
+            border-radius: 8px;
+            display: none;
+            animation: slideIn 0.4s ease;
+        }
+
+        .model-answer.show {
+            display: block;
+        }
+
+        .model-answer h4 {
+            color: var(--color-titles);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .model-answer p {
+            color: var(--color-text);
+            margin: 0;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* ==========================================
+           🆕 PREGUNTA DE ANÁLISIS PRINCIPAL (DESTACADA)
+           ========================================== */
+        .analysis-question {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            border: 3px solid var(--btn-primary);
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .analysis-question::before {
+            content: "🎯";
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 120px;
+            opacity: 0.08;
+        }
+
+        .analysis-question h3 {
+            color: var(--color-titles);
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .analysis-question > p {
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        /* 🆕 TEXTAREA GRANDE Y VISIBLE PARA RESPUESTA PRINCIPAL */
+        .answer-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1rem;
+            border: 2px solid var(--btn-primary);
+        }
+
+        .answer-container-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px dashed #e2e8f0;
+        }
+
+        .answer-container-title {
+            color: var(--color-titles);
+            font-weight: 700;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .answer-counter {
+            background: var(--bg-primary);
+            color: var(--color-subtitles);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .main-answer-textarea {
+            width: 100%;
+            min-height: 250px;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--border-radius);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: vertical;
+            color: var(--color-text);
+            background: #fafbfc;
+            transition: all 0.3s;
+        }
+
+        .main-answer-textarea:focus {
+            outline: none;
+            border-color: var(--btn-primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .main-answer-textarea::placeholder {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        .answer-hints {
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            background: #fef3c7;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #92400e;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .answer-hints::before {
+            content: "💡";
+            flex-shrink: 0;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .btn {
+            padding: 0.85rem 1.75rem;
+            border: none;
+            border-radius: var(--border-radius);
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--btn-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--btn-primary-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .feedback-box {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+
+        .feedback-box.show {
+            display: block;
+        }
+
+        .feedback-success {
+            background: #d1fae5;
+            border-left: 5px solid var(--success-color);
+            color: #065f46;
+        }
+
+        .feedback-error {
+            background: #fee2e2;
+            border-left: 5px solid var(--error-color);
+            color: #991b1b;
+        }
+
+        .feedback-box h4 {
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .feedback-box p {
+            margin: 0;
+            line-height: 1.7;
+        }
+
+        /* ==========================================
+           GAMIFICACIÓN - BIRRETE FLOTANTE
+           ========================================== */
+        .graduation-cap {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .graduation-cap.show {
+            opacity: 1;
+            transform: scale(1);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-10px) rotate(5deg);
+            }
+        }
+
+        .retry-message {
+            position: fixed;
+            bottom: 110px;
+            right: 20px;
+            background: var(--warning-color);
+            color: white;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            display: none;
+            animation: shake 0.5s;
+            z-index: 999;
+            max-width: 250px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .retry-message.show {
+            display: block;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* ==========================================
+           BOTÓN FINAL - MOODLE
+           ========================================== */
+        .moodle-section {
+            text-align: center;
+            margin: 4rem 0;
+        }
+
+        .btn-moodle {
+            background: linear-gradient(135deg, var(--btn-secondary) 0%, var(--btn-secondary-hover) 100%);
+            color: white;
+            padding: 1.5rem 3rem;
+            font-size: 1.25rem;
+            border-radius: 50px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-moodle:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-moodle::before {
+            content: "🚀";
+            font-size: 1.5rem;
+        }
+
+        /* ==========================================
+           FOOTER
+           ========================================== */
+        footer {
+            background: var(--color-titles);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        footer p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        /* ==========================================
+           RESPONSIVE DESIGN
+           ========================================== */
+        @media (max-width: 768px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .hero {
+                padding: 3rem 1.5rem;
+            }
+
+            .container {
+                padding: 2rem 1rem;
+            }
+
+            .graduation-cap {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+                bottom: 10px;
+                right: 10px;
+            }
+
+            .retry-message {
+                bottom: 80px;
+                right: 10px;
+                font-size: 0.9rem;
+            }
+
+            .btn-moodle {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .analysis-question {
+                padding: 1.5rem;
+            }
+
+            .main-answer-textarea {
+                min-height: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card-content {
+                padding: 1.5rem;
+            }
+
+            .reflection {
+                padding: 2rem 1.5rem;
+            }
+
+            .reflection h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Utilidades */
+        .text-center {
+            text-align: center;
+        }
+
+        .mb-4 {
+            margin-bottom: 2rem;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HERO SECTION -->
+    <header class="hero">
+        <h1>Propiedades Intensivas y Extensivas</h1>
+        <p>Descubre cómo la termodinámica clasifica las propiedades de la materia según su dependencia de la masa y su comportamiento en sistemas físicos</p>
+    </header>
+
+    <main class="container">
+
+        <!-- GRID DE TARJETAS -->
+        <div class="cards-grid">
+            
+            <!-- TARJETA 1: PROPIEDADES INTENSIVAS -->
+            <article class="card">
+                <div class="card-image">
+                    <img src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80" alt="Termómetro y propiedades intensivas">
+                </div>
+                <div class="card-content">
+                    <h2>Propiedades Intensivas</h2>
+                    <p>
+                        Las <span class="highlight">propiedades intensivas</span> son aquellas características de un sistema que NO dependen de la cantidad de materia presente. Su valor es independiente del tamaño o masa del sistema.
+                    </p>
+                    <p>
+                        <strong>Ejemplos fundamentales:</strong> Temperatura (T), Presión (P), Densidad (ρ), Viscosidad, Índice de refracción, Punto de ebullición, Calor específico.
+                    </p>
+                    
+                    <div class="nature-comparison">
+                        <h3>🌊 Fenómeno Natural: El Lago y la Gota</h3>
+                        <p>Imagina un lago enorme y una pequeña gota de agua del mismo lago. Ambos tienen la <strong>misma temperatura</strong> si están en equilibrio térmico. La temperatura es intensiva porque no importa si tienes un litro o un millón de litros de agua a 25°C, la temperatura sigue siendo 25°C. Sin embargo, el <strong>volumen</strong> (propiedad extensiva) es radicalmente diferente.</p>
+                    </div>
+
+                    <div class="tech-detail">
+                        <h4>📐 Detalle Técnico</h4>
+                        <p>
+                            Matemáticamente: Si dividimos un sistema en dos partes iguales, las propiedades intensivas permanecen constantes.<br><br>
+                            <strong>Ecuación:</strong> X_intensiva(sistema) = X_intensiva(parte 1) = X_intensiva(parte 2)
+                        </p>
+                    </div>
+
+                    <div class="curiosity">
+                        El punto de fusión del hielo es 0°C tanto para un cubito de hielo como para un iceberg gigante. ¡La naturaleza no discrimina por tamaño cuando se trata de propiedades intensivas!
+                    </div>
+
+                    <a href="https://es.wikipedia.org/wiki/Propiedad_intensiva" target="_blank">
+                        Leer más en Wikipedia →
+                    </a>
+                </div>
+            </article>
+
+            <!-- TARJETA 2: PROPIEDADES EXTENSIVAS -->
+            <article class="card">
+                <div class="card-image">
+                    <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80" alt="Balanza y propiedades extensivas">
+                </div>
+                <div class="card-content">
+                    <h2>Propiedades Extensivas</h2>
+                    <p>
+                        Las <span class="highlight">propiedades extensivas</span> son aquellas que SÍ dependen de la cantidad de materia del sistema. Su valor es proporcional a la masa o tamaño del sistema.
+                    </p>
+                    <p>
+                        <strong>Ejemplos clave:</strong> Masa (m), Volumen (V), Energía interna (U), Entalpía (H), Entropía (S), Número de moles (n).
+                    </p>
+
+                    <div class="nature-comparison">
+                        <h3>🏔️ Fenómeno Natural: Montañas de Nieve</h3>
+                        <p>Considera dos montañas nevadas: una pequeña colina y el Everest. La <strong>masa total de nieve</strong> es claramente diferente (extensiva), pero si ambas están a la misma altitud y condiciones, la <strong>temperatura</strong> de la nieve será similar (intensiva). La energía térmica total almacenada, sin embargo, será mucho mayor en el Everest por tener más masa.</p>
+                    </div>
+
+                    <div class="tech-detail">
+                        <h4>📐 Detalle Técnico</h4>
+                        <p>
+                            Las propiedades extensivas son aditivas. Si combinamos dos sistemas:<br><br>
+                            <strong>Ecuación:</strong> X_extensiva(total) = X_extensiva(sistema 1) + X_extensiva(sistema 2)<br><br>
+                            <em>Ejemplo:</em> V_total = V₁ + V₂
+                        </p>
+                    </div>
+
+                    <div class="curiosity">
+                        Si tienes 1 kg de agua a 20°C y agregas otro kg de agua a 20°C, tendrás 2 kg de agua (extensiva) pero seguirá a 20°C (intensiva). ¡La masa se suma, la temperatura no!
+                    </div>
+
+                    <a href="https://es.wikipedia.org/wiki/Propiedad_extensiva" target="_blank">
+                        Leer más en Wikipedia →
+                    </a>
+                </div>
+            </article>
+
+            <!-- TARJETA 3: RELACIÓN Y CONVERSIÓN -->
+            <article class="card" style="grid-column: 1 / -1;">
+                <div class="card-content">
+                    <h2>Relación entre Propiedades: De Extensiva a Intensiva</h2>
+                    <p>
+                        Una propiedad extensiva puede convertirse en intensiva dividiéndola por la masa o el número de moles del sistema. Esto es fundamental en termodinámica para comparar sistemas de diferentes tamaños.
+                    </p>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin: 2rem 0;">
+                        <div style="background: var(--bg-primary); padding: 1.5rem; border-radius: var(--border-radius);">
+                            <h3 style="color: var(--color-titles); margin-bottom: 1rem;">🔄 Conversión Práctica</h3>
+                            <ul style="list-style: none; line-height: 2;">
+                                <li>• <strong>Volumen específico:</strong> v = V/m (m³/kg)</li>
+                                <li>• <strong>Energía interna específica:</strong> u = U/m (J/kg)</li>
+                                <li>• <strong>Entalpía específica:</strong> h = H/m (J/kg)</li>
+                                <li>• <strong>Entropía específica:</strong> s = S/m (J/kg·K)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="nature-comparison" style="margin: 0;">
+                            <h3>🌍 Fenómeno Natural: La Atmósfera</h3>
+                            <p>La atmósfera terrestre tiene una <strong>masa total</strong> enorme (propiedad extensiva: ~5.15×10¹⁸ kg). Sin embargo, la <strong>densidad del aire</strong> (propiedad intensiva) varía con la altitud pero es independiente de cuánto aire haya en total. Podemos estudiar la densidad en un punto sin importar el tamaño total de la atmósfera.</p>
+                        </div>
+                    </div>
+
+                    <div class="tech-detail">
+                        <h4>📐 Detalle Técnico: Propiedades Molares</h4>
+                        <p>
+                            En química y termodinámica, es común usar propiedades molares (por mol):<br>
+                            <strong>V_m = V/n</strong> (Volumen molar en m³/mol)<br>
+                            <strong>U_m = U/n</strong> (Energía interna molar en J/mol)<br><br>
+                            <em>Aplicación:</em> El volumen molar de un gas ideal en CNPT es 22.4 L/mol, independientemente de si tenemos 1 mol o 100 moles.
+                        </p>
+                    </div>
+
+                    <div class="curiosity">
+                        El oro tiene una densidad de 19.3 g/cm³ (intensiva) sin importar si tienes un anillo pequeño o una barra de oro de 1 kg. Pero el valor económico (extensivo) depende totalmente de la masa que poseas.
+                    </div>
+
+                    <a href="https://es.wikipedia.org/wiki/Propiedad_espec%C3%ADfica" target="_blank">
+                        Propiedades específicas en Wikipedia →
+                    </a>
+                </div>
+            </article>
+
+            <!-- TARJETA 4: APLICACIONES PRÁCTICAS -->
+            <article class="card">
+                <div class="card-content">
+                    <h2>Aplicaciones en Ingeniería</h2>
+                    <p>
+                        El entendimiento de estas propiedades es crucial para el diseño de sistemas térmicos, motores, refrigeradores y plantas de potencia.
+                    </p>
+                    
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: var(--border-radius); margin: 1rem 0;">
+                        <h3 style="margin-bottom: 1rem;">🏭 Caso Práctico: Turbina de Vapor</h3>
+                        <p style="margin: 0; font-size: 0.95rem;">
+                            En una turbina, el <strong>flujo másico</strong> (kg/s) es extensivo y determina la potencia total. Pero la <strong>entalpía específica</strong> (kJ/kg) es intensiva y determina la eficiencia del proceso, independientemente del tamaño de la turbina.
+                        </p>
+                    </div>
+
+                    <div class="curiosity">
+                        Los ingenieros usan propiedades intensivas para escalar procesos: si un reactor pequeño funciona bien, pueden diseñar uno grande manteniendo las mismas temperaturas y presiones (intensivas), pero ajustando volúmenes y flujos (extensivos).
+                    </div>
+
+                    <a href="https://es.wikipedia.org/wiki/Termodin%C3%A1mica" target="_blank">
+                        Fundamentos de Termodinámica →
+                    </a>
+                </div>
+            </article>
+
+        </div>
+
+        <!-- SECCIÓN DE REFLEXIÓN -->
+        <section class="reflection">
+            <h2>Reflexión Final</h2>
+            <p>
+                "La termodinámica nos enseña que en el universo existen cualidades que trascienden la cantidad. Así como la temperatura de una estrella no depende de su tamaño sino de su naturaleza, en la vida hay valores intensivos—como el amor, la sabiduría y la integridad—que no se miden por cuánto tenemos, sino por quiénes somos. Comprender la diferencia entre lo que crece con la masa y lo que permanece constante es el primer paso para dominar tanto la energía como nuestro propio potencial."
+            </p>
+        </section>
+
+        <!-- ZONA DE PREGUNTAS IA -->
+        <section class="qa-section" id="zona-ia">
+            <h2>🤖 Zona de Preguntas con IA</h2>
+            
+            <div class="question-bank">
+                
+                <!-- PREGUNTA 1 CON ÁREA DE RESPUESTA -->
+                <div class="question-item">
+                    <h3>Pregunta 1: Conceptos Básicos</h3>
+                    <p>¿Cuál es la diferencia fundamental entre una propiedad intensiva y una extensiva? Da dos ejemplos de cada una.</p>
+                    
+                    <div class="answer-box">
+                        <div class="answer-box-label">Tu respuesta:</div>
+                        <textarea class="answer-input" placeholder="Escribe aquí tu respuesta..."></textarea>
+                    </div>
+                    <button class="btn-show-answer" onclick="toggleModelAnswer(this)">
+                        👁️ Ver respuesta modelo
+                    </button>
+                    <div class="model-answer">
+                        <h4>✅ Respuesta modelo:</h4>
+                        <p>Las <strong>propiedades intensivas</strong> NO dependen de la cantidad de materia (ej: temperatura, densidad, presión). Las <strong>propiedades extensivas</strong> SÍ dependen de la cantidad de materia (ej: masa, volumen, energía interna). Si dividimos un sistema, las intensivas permanecen iguales y las extensivas se reducen proporcionalmente.</p>
+                    </div>
+                </div>
+                
+                <!-- PREGUNTA 2 CON ÁREA DE RESPUESTA -->
+                <div class="question-item">
+                    <h3>Pregunta 2: Aplicación</h3>
+                    <p>Si dividimos un sistema termodinámico en dos partes iguales, ¿qué sucede con la temperatura y el volumen de cada parte?</p>
+                    
+                    <div class="answer-box">
+                        <div class="answer-box-label">Tu respuesta:</div>
+                        <textarea class="answer-input" placeholder="Escribe aquí tu respuesta..."></textarea>
+                    </div>
+                    <button class="btn-show-answer" onclick="toggleModelAnswer(this)">
+                        👁️ Ver respuesta modelo
+                    </button>
+                    <div class="model-answer">
+                        <h4>✅ Respuesta modelo:</h4>
+                        <p>La <strong>temperatura</strong> (propiedad intensiva) permanece IGUAL en ambas partes, ya que no depende de la cantidad de materia. El <strong>volumen</strong> (propiedad extensiva) se reduce a la MITAD en cada parte, ya que es proporcional a la cantidad de materia del sistema.</p>
+                    </div>
+                </div>
+                
+                <!-- PREGUNTA 3 CON ÁREA DE RESPUESTA -->
+                <div class="question-item">
+                    <h3>Pregunta 3: Cálculo</h3>
+                    <p>Un tanque contiene 100 kg de agua a 25°C. Si agregamos 50 kg más de agua a la misma temperatura, ¿cuál será la temperatura final y la masa total?</p>
+                    
+                    <div class="answer-box">
+                        <div class="answer-box-label">Tu respuesta:</div>
+                        <textarea class="answer-input" placeholder="Escribe aquí tu respuesta..."></textarea>
+                    </div>
+                    <button class="btn-show-answer" onclick="toggleModelAnswer(this)">
+                        👁️ Ver respuesta modelo
+                    </button>
+                    <div class="model-answer">
+                        <h4>✅ Respuesta modelo:</h4>
+                        <p>La <strong>masa total</strong> será 150 kg (100 + 50), ya que la masa es extensiva y se suma. La <strong>temperatura final</strong> será 25°C, ya que la temperatura es intensiva y al mezclar agua a la misma temperatura, esta no cambia.</p>
+                    </div>
+                </div>
+                
+                <!-- PREGUNTA 4 CON ÁREA DE RESPUESTA -->
+                <div class="question-item">
+                    <h3>Pregunta 4: Análisis</h3>
+                    <p>Explica por qué la densidad es una propiedad intensiva aunque se calcule dividiendo masa (extensiva) entre volumen (extensivo).</p>
+                    
+                    <div class="answer-box">
+                        <div class="answer-box-label">Tu respuesta:</div>
+                        <textarea class="answer-input" placeholder="Escribe aquí tu respuesta..."></textarea>
+                    </div>
+                    <button class="btn-show-answer" onclick="toggleModelAnswer(this)">
+                        👁️ Ver respuesta modelo
+                    </button>
+                    <div class="model-answer">
+                        <h4>✅ Respuesta modelo:</h4>
+                        <p>La densidad ρ = m/V es intensiva porque al dividir dos propiedades extensivas, el resultado es intensivo. Si duplicamos la masa, también se duplica el volumen proporcionalmente, por lo que la razón m/V permanece constante. Las propiedades extensivas se "cancelan" entre sí al dividirlas.</p>
+                    </div>
+                </div>
+
+                <!-- PREGUNTA 5 CON ÁREA DE RESPUESTA -->
+                <div class="question-item">
+                    <h3>Pregunta 5: Clasificación</h3>
+                    <p>Clasifica las siguientes propiedades como intensivas o extensivas: presión, entalpía, calor específico, entropía, punto de ebullición, número de moles.</p>
+                    
+                    <div class="answer-box">
+                        <div class="answer-box-label">Tu respuesta:</div>
+                        <textarea class="answer-input" placeholder="Escribe aquí tu respuesta..."></textarea>
+                    </div>
+                    <button class="btn-show-answer" onclick="toggleModelAnswer(this)">
+                        👁️ Ver respuesta modelo
+                    </button>
+                    <div class="model-answer">
+                        <h4>✅ Respuesta modelo:</h4>
+                        <p><strong>Intensivas:</strong> presión, calor específico, punto de ebullición. <strong>Extensivas:</strong> entalpía, entropía, número de moles. Recuerda: las intensivas no dependen de la cantidad de materia, las extensivas sí.</p>
+                    </div>
+                </div>
+
+                <!-- ==========================================
+                     🎯 PREGUNTA DE ANÁLISIS PRINCIPAL CON IA
+                     ========================================== -->
+                <div class="analysis-question">
+                    <h3>🎯 Pregunta de Análisis Profundo (con Retroalimentación IA)</h3>
+                    <p>
+                        <strong>Situación:</strong> Tienes dos recipientes con el mismo gas ideal. El recipiente A tiene el doble de volumen que el recipiente B, pero ambos están a la misma temperatura y presión.<br><br>
+                        <strong>Pregunta:</strong> Compara las siguientes propiedades entre ambos recipientes indicando si son iguales o diferentes, y justifica tu respuesta basándote en el concepto de propiedades intensivas y extensivas:<br>
+                        <strong>a)</strong> Número de moles del gas<br>
+                        <strong>b)</strong> Densidad del gas<br>
+                        <strong>c)</strong> Energía interna total<br>
+                        <strong>d)</strong> Temperatura
+                    </p>
+                    
+                    <!-- 🆕 CUADRO GRANDE Y VISIBLE PARA LA RESPUESTA -->
+                    <div class="answer-container">
+                        <div class="answer-container-header">
+                            <div class="answer-container-title">
+                                ✍️ Escribe tu respuesta aquí
+                            </div>
+                            <div class="answer-counter" id="char-counter">0 caracteres</div>
+                        </div>
+                        
+                        <textarea 
+                            id="student-answer" 
+                            class="main-answer-textarea" 
+                            placeholder="Analiza cada inciso (a, b, c, d) y explica si la propiedad es intensiva o extensiva, y por qué es igual o diferente entre los recipientes A y B.&#10;&#10;Ejemplo de formato:&#10;a) Número de moles: ...&#10;b) Densidad: ...&#10;c) Energía interna: ...&#10;d) Temperatura: ..."
+                            oninput="updateCounter()"
+                        ></textarea>
+                        
+                        <div class="answer-hints">
+                            <div>
+                                <strong>Pista:</strong> Recuerda usar la ecuación de los gases ideales PV = nRT y analizar qué variables dependen del volumen del recipiente.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="checkAnswer()">
+                        🤖 Consultar Retroalimentación de IA
+                    </button>
+                    
+                    <div id="feedback" class="feedback-box">
+                        <h4 id="feedback-title"></h4>
+                        <p id="feedback-text"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BOTÓN MOODLE -->
+        <div class="moodle-section">
+            <a href="https://moodle.uptbolivar.edu.ve" target="_blank" class="btn-moodle">
+                Estoy preparado, voy a la evaluación
+            </a>
+            <p style="margin-top: 1rem; color: var(--color-text-light);">
+                ¡Confía en tu preparación! Has estudiado las propiedades termodinámicas y estás listo para demostrar tu conocimiento.
+            </p>
+        </div>
+
+    </main>
+
+    <!-- GAMIFICACIÓN: BIRRETE FLOTANTE -->
+    <div id="graduation-cap" class="graduation-cap" title="¡Excelente trabajo!">
+        🎓
+    </div>
+    
+    <div id="retry-message" class="retry-message">
+        💪 ¡Sigue intentándolo! Tu respuesta necesita más precisión. Revisa los conceptos de propiedades intensivas y extensivas.
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p><strong>ESP Kenny Uriepero</strong></p>
+        <p>Termodinámica UPTBolivar | © 2026</p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">
+            Departamento de Ingeniería Mecánica
+        </p>
+    </footer>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // ==========================================
+        // 🆕 FUNCIÓN PARA MOSTRAR/OCULTAR RESPUESTA MODELO
+        // ==========================================
+        function toggleModelAnswer(button) {
+            const modelAnswer = button.nextElementSibling;
+            modelAnswer.classList.toggle('show');
+            
+            if (modelAnswer.classList.contains('show')) {
+                button.innerHTML = '🙈 Ocultar respuesta modelo';
+            } else {
+                button.innerHTML = '👁️ Ver respuesta modelo';
+            }
+        }
+
+        // ==========================================
+        // 🆕 CONTADOR DE CARACTERES
+        // ==========================================
+        function updateCounter() {
+            const textarea = document.getElementById('student-answer');
+            const counter = document.getElementById('char-counter');
+            const length = textarea.value.length;
+            counter.textContent = `${length} caracteres`;
+            
+            // Cambiar color según el progreso
+            if (length === 0) {
+                counter.style.background = '#f1f5f9';
+                counter.style.color = '#64748b';
+            } else if (length < 100) {
+                counter.style.background = '#fee2e2';
+                counter.style.color = '#991b1b';
+            } else if (length < 250) {
+                counter.style.background = '#fef3c7';
+                counter.style.color = '#92400e';
+            } else {
+                counter.style.background = '#d1fae5';
+                counter.style.color = '#065f46';
+            }
+        }
+
+        // ==========================================
+        // FUNCIÓN PARA VERIFICAR RESPUESTA PRINCIPAL
+        // ==========================================
+        function checkAnswer() {
+            const answer = document.getElementById('student-answer').value.toLowerCase();
+            const feedbackBox = document.getElementById('feedback');
+            const feedbackTitle = document.getElementById('feedback-title');
+            const feedbackText = document.getElementById('feedback-text');
+            const retryMessage = document.getElementById('retry-message');
+            const graduationCap = document.getElementById('graduation-cap');
+
+            if (answer.length < 50) {
+                feedbackBox.className = 'feedback-box feedback-error show';
+                feedbackTitle.textContent = '⚠️ Respuesta Incompleta';
+                feedbackText.textContent = 'Tu respuesta es muy corta. Por favor, desarrolla más tu análisis explicando cada punto (a, b, c, d) con al menos 50 caracteres.';
+                retryMessage.classList.add('show');
+                graduationCap.classList.remove('show');
+                setTimeout(() => retryMessage.classList.remove('show'), 5000);
+                return;
+            }
+
+            // Palabras clave para evaluar la respuesta
+            const correctKeywords = [
+                'moles', 'diferente', 'extensiva', 'volumen', 'doble',
+                'densidad', 'igual', 'intensiva', 'masa', 'energía',
+                'temperatura', 'presión', 'gas ideal', 'proporcional',
+                'nrt', 'pv', 'recipiente'
+            ];
+
+            // Análisis de palabras clave
+            let matches = 0;
+            const foundKeywords = [];
+            correctKeywords.forEach(keyword => {
+                if (answer.includes(keyword)) {
+                    matches++;
+                    foundKeywords.push(keyword);
+                }
+            });
+
+            // Cálculo de porcentaje de acierto
+            const accuracy = (matches / correctKeywords.length) * 100;
+
+            // Respuesta modelo esperada
+            const modelAnswer = `
+                <strong>📚 Respuesta Esperada:</strong><br><br>
+                <strong>a) Número de moles:</strong> DIFERENTE (El recipiente A tiene el doble de moles). Como n = PV/RT y P, R, T son iguales pero V_A = 2V_B, entonces n_A = 2n_B. El número de moles es una propiedad <span class="highlight">extensiva</span>.<br><br>
+                
+                <strong>b) Densidad:</strong> IGUAL (ρ = m/V = PM/RT). Como P y T son iguales, la densidad es la misma. La densidad es una propiedad <span class="highlight">intensiva</span>.<br><br>
+                
+                <strong>c) Energía interna total:</strong> DIFERENTE (U_A = 2U_B). Para gas ideal, U = nCvT. Como n_A = 2n_B y T es igual, U_A = 2U_B. La energía interna es <span class="highlight">extensiva</span>.<br><br>
+                
+                <strong>d) Temperatura:</strong> IGUAL (T_A = T_B). La temperatura es una propiedad <span class="highlight">intensiva</span> por definición, no depende del tamaño del sistema.
+            `;
+
+            if (accuracy >= 50) {
+                // Respuesta aceptable
+                feedbackBox.className = 'feedback-box feedback-success show';
+                feedbackTitle.textContent = `✅ ¡Buen trabajo! Nivel de acierto: ${Math.round(accuracy)}%`;
+                feedbackText.innerHTML = `
+                    Has identificado correctamente los conceptos clave. ${accuracy >= 80 ? '¡Excelente análisis!' : 'Buen intento, pero puedes mejorar algunos detalles.'}<br><br>
+                    <strong>Conceptos detectados en tu respuesta:</strong> ${foundKeywords.join(', ')}<br><br>
+                    ${modelAnswer}
+                `;
+                
+                // Mostrar birrete con animación
+                graduationCap.classList.add('show');
+                retryMessage.classList.remove('show');
+                
+            } else {
+                // Respuesta incorrecta o incompleta
+                feedbackBox.className = 'feedback-box feedback-error show';
+                feedbackTitle.textContent = `❌ Respuesta Necesita Mejorar - Nivel: ${Math.round(accuracy)}%`;
+                feedbackText.innerHTML = `
+                    Tu respuesta no alcanza el 50% de precisión. Faltan conceptos clave sobre propiedades intensivas y extensivas.<br><br>
+                    <strong>📝 Puntos a mejorar:</strong><br>
+                    • Debes mencionar que el número de moles y la energía son <strong>EXTENSIVOS</strong> (dependen del volumen/masa)<br>
+                    • La densidad y temperatura son <strong>INTENSIVAS</strong> (no dependen del tamaño)<br>
+                    • Justifica matemáticamente usando las ecuaciones de estado (PV = nRT)<br><br>
+                    ${modelAnswer}
+                `;
+                
+                graduationCap.classList.remove('show');
+                retryMessage.classList.add('show');
+                
+                setTimeout(() => {
+                    retryMessage.classList.remove('show');
+                }, 5000);
+            }
+
+            // Scroll suave hacia el feedback
+            feedbackBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Efecto de escritura en el textarea
+        document.getElementById('student-answer').addEventListener('input', function() {
+            const retryMessage = document.getElementById('retry-message');
+            if (this.value.length > 0) {
+                retryMessage.classList.remove('show');
+            }
+        });
+
+        // Animación de entrada para las tarjetas
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Aplicar animación a las tarjetas
+        document.querySelectorAll('.card').forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+            observer.observe(card);
+        });
+    </script>
+
+</body>
+</html>

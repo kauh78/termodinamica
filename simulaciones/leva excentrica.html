@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulador Cinemático: Leva Excéntrica con Seguidor de Rodillo</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      color: #f8fafc;
+    }
+    h1 { 
+      margin-bottom: 15px; 
+      font-size: 26px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+    
+    /* Contenedor principal translúcido con efecto Blur */
+    .contenedor {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      background: rgba(30, 41, 59, 0.7);
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      max-width: 1100px;
+      width: 100%;
+    }
+    
+    /* Área del gráfico SVG */
+    .area-grafica { flex: 1; min-width: 500px; }
+    svg { 
+      width: 100%; 
+      height: auto; 
+      border: 1px solid #334155; 
+      border-radius: 12px; 
+      background: #090d16; 
+    }
+
+    /* Panel de controles laterales */
+    .panel-controles {
+      width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #334155;
+    }
+    .control-group { display: flex; flex-direction: column; gap: 6px; }
+    label { font-size: 13px; font-weight: bold; color: #cbd5e1; display: flex; justify-content: space-between; }
+    label span { color: #38bdf8; font-family: monospace; font-size: 14px; }
+    input[type="range"] { width: 100%; cursor: pointer; accent-color: #38bdf8; }
+
+    /* Clases de Estilo Estructurales para el Sistema Leva-Seguidor */
+    .guias-soporte { fill: #475569; stroke: #64748b; stroke-width: 2; }
+    .leva-perfil { fill: rgba(244, 63, 94, 0.2); stroke: #f43f5e; stroke-width: 4; }
+    .linea-excentricidad { stroke: #38bdf8; stroke-width: 3; stroke-linecap: round; }
+    .seguidor-vástago { stroke: #10b981; stroke-width: 6; stroke-linecap: round; }
+    .seguidor-rodillo { fill: #0f172a; stroke: #10b981; stroke-width: 4; }
+    .perno-fijo { fill: #ffffff; stroke: #334155; stroke-width: 2.5; }
+    .perno-movil { fill: #ffffff; stroke: #475569; stroke-width: 1.5; }
+    .linea-referencia { stroke: #334155; stroke-width: 1; stroke-dasharray: 6,4; }
+  </style>
+</head>
+<body>
+
+  <h1>Simulador Cinemático: Leva Excéntrica y Seguidor</h1>
+
+  <div class="contenedor">
+    
+    <div class="area-grafica">
+      <svg viewBox="0 0 800 500">
+        <line x1="400" y1="50" x2="400" y2="450" class="linea-referencia" />
+        <line id="linea-desfase-izq" x1="400" y1="50" x2="400" y2="450" class="linea-referencia" style="stroke: #1e293b;" />
+        <line x1="150" y1="320" x2="650" y2="320" class="linea-referencia" />
+        
+        <rect id="guia-izquierda" x="365" y="100" width="15" height="120" rx="2" class="guias-soporte" />
+        <rect id="guia-derecha" x="420" y="100" width="15" height="120" rx="2" class="guias-soporte" />
+
+        <g id="grupo-leva">
+          <circle id="perfil-leva" cx="400" cy="320" r="80" class="leva-perfil" />
+          <line id="brazo-excentricidad" x1="400" y1="320" x2="400" y2="320" class="linea-excentricidad" />
+          <circle id="centro-geometrico" cx="400" cy="320" r="5" class="perno-movil" />
+        </g>
+
+        <circle id="arbol-levas" cx="400" cy="320" r="10" class="bancada-soporte" fill="#334155" stroke="#64748b" stroke-width="2" />
+        <circle cx="400" cy="320" r="4" class="perno-fijo" />
+
+        <g id="grupo-seguidor">
+          <line id="vastago" x1="400" y1="100" x2="400" y2="220" class="seguidor-vástago" />
+          <circle id="rodillo" cx="400" cy="220" r="20" class="seguidor-rodillo" />
+          <circle id="perno-rodillo" cx="400" cy="220" r="4" class="perno-fijo" />
+          <rect id="terminal-carga" x="375" y="80" width="50" height="20" rx="3" fill="#10b981" stroke="#059669" stroke-width="2" />
+        </g>
+
+        <g id="panel-variables" transform="translate(20, 20)">
+          <rect x="0" y="0" width="240" height="140" rx="8" fill="#1e293b" opacity="0.9" stroke="#334155" stroke-width="2" />
+          <text x="15" y="25" fill="#f8fafc" font-family="monospace" font-size="13" font-weight="bold" letter-spacing="1">TELEMETRÍA DINÁMICA</text>
+          <line x1="15" y1="32" x2="225" y2="32" stroke="#334155" stroke-width="1.5" />
+          
+          <text x="15" y="60" fill="#34d399" font-family="monospace" font-size="14" font-weight="bold">Ángulo Cam:  <tspan id="txt-angulo">0</tspan>°</text>
+          <text x="15" y="85" fill="#38bdf8" font-family="monospace" font-size="14" font-weight="bold">Alzada (y):  <tspan id="txt-posicion">0.0</tspan> mm</text>
+          <text x="15" y="110" fill="#fbbf24" font-family="monospace" font-size="14" font-weight="bold">Presión Con: <tspan id="txt-fuerza">0.0</tspan> N</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="panel-controles">
+      <h3 style="margin-top:0; color:#f8fafc; font-size:16px; border-bottom:2px solid #38bdf8; padding-bottom:5px;">Configuración</h3>
+      
+      <div class="control-group">
+        <label>Radio Leva (R): <span id="val-r">80</span> px</label>
+        <input type="range" id="sl-r" min="50" max="110" value="80" step="1">
+      </div>
+
+      <div class="control-group">
+        <label>Excentricidad (e): <span id="val-e">35</span> px</label>
+        <input type="range" id="sl-e" min="10" max="60" value="35" step="1">
+      </div>
+
+      <div class="control-group">
+        <label>Radio Rodillo (Rr): <span id="val-rr">20</span> px</label>
+        <input type="range" id="sl-rr" min="10" max="35" value="20" step="1">
+      </div>
+
+      <div class="control-group">
+        <label>Desfase Eje (Offset): <span id="val-os">0</span> px</label>
+        <input type="range" id="sl-os" min="-50" max="50" value="0" step="1">
+      </div>
+
+      <div class="control-group">
+        <label>Velocidad de Giro: <span id="val-rpm">1</span></label>
+        <input type="range" id="sl-rpm" min="0" max="4" value="1" step="0.2">
+      </div>
+
+      <div class="control-group" style="margin-top: 5px;">
+        <button id="btn-play-pause" style="width: 100%; padding: 12px; background-color: #ef4444; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer; transition: background 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+          Pausar Animación
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Componentes de la Leva
+    const perfilLeva = document.getElementById('perfil-leva');
+    const brazoExcentricidad = document.getElementById('brazo-excentricidad');
+    const centroGeometrico = document.getElementById('centro-geometrico');
+    const arbolLevas = document.getElementById('arbol-levas');
+
+    // Componentes del Seguidor
+    const vastago = document.getElementById('vastago');
+    const rodillo = document.getElementById('rodillo');
+    const pernoRodillo = document.getElementById('perno-rodillo');
+    const terminalCarga = document.getElementById('terminal-carga');
+    
+    // Guías mecánicas fijas
+    const guiaIzquierda = document.getElementById('guia-izquierda');
+    const guiaDerecha = document.getElementById('guia-derecha');
+    const lineaDesfaseIzq = document.getElementById('linea-desfase-izq');
+
+    // Selectores del panel de control
+    const slR = document.getElementById('sl-r');
+    const slE = document.getElementById('sl-e');
+    const slRr = document.getElementById('sl-rr');
+    const slOs = document.getElementById('sl-os');
+    const slRpm = document.getElementById('sl-rpm');
+    const btnPlayPause = document.getElementById('btn-play-pause');
+
+    // Visores dinámicos
+    const valR = document.getElementById('val-r');
+    const valE = document.getElementById('val-e');
+    const valRr = document.getElementById('val-rr');
+    const valOs = document.getElementById('val-os');
+    const valRpm = document.getElementById('val-rpm');
+    
+    const txtAngulo = document.getElementById('txt-angulo');
+    const txtPosicion = document.getElementById('txt-posicion');
+    const txtFuerza = document.getElementById('txt-fuerza');
+
+    // Coordenadas constantes del eje de giro del árbol de levas (Centro de entrada)
+    const x0 = 400;  
+    const y0 = 320;  
+    
+    let anguloMotor = 0;  
+    let ejecutando = true;
+
+    function actualizarMecanismo() {
+      if (!ejecutando) return;
+
+      // 1. Carga paramétrica de las variables geométricas
+      let R = parseFloat(slR.value);   // Radio de la leva circular
+      let e = parseFloat(slE.value);   // Distancia del eje al centro geométrico (Excentricidad)
+      let rr = parseFloat(slRr.value); // Radio del rodillo inferior
+      let offset = parseFloat(slOs.value); // Desfase horizontal del eje del seguidor
+      let velocidad = parseFloat(slRpm.value);
+
+      // Actualizar lecturas en el tablero del panel de control
+      valR.textContent = R;
+      valE.textContent = e;
+      valRr.textContent = rr;
+      valOs.textContent = offset;
+      valRpm.textContent = velocidad === 0 ? "PAUSA" : velocidad;
+
+      // CANDADO INTEGRADO DE SEGURIDAD GEOMÉTRICA: 
+      // La excentricidad nunca debe superar al radio base para evitar perfiles físicamente rotos o lazos sin continuidad.
+      if (e >= R - 5) {
+        e = R - 5;
+        slE.value = e;
+        valE.textContent = e;
+      }
+
+      // 2. Progreso síncrono del ángulo de rotación
+      anguloMotor = (anguloMotor + velocidad) % 360;
+      let rad = anguloMotor * (Math.PI / 180);
+
+      // 3. ANÁLISIS CINEMÁTICO VECTORIAL (Leva excéntrica descentrada)
+      // Ubicación instantánea del centro geométrico móvil de la leva en el espacio
+      let xc = x0 + e * Math.cos(rad);
+      let yc = y0 - e * Math.sin(rad); // Inversión cartesiana estándar para simulación SVG
+
+      // Eje coordenado X fijo donde opera el seguidor vertical
+      let xSeguidor = x0 + offset;
+
+      // Determinación trigonométrica analítica de la altura del seguidor (ySeguidor)
+      // Basado en el triángulo rectángulo formado entre el centro de la leva y el centro del rodillo
+      let dx = xSeguidor - xc;
+      
+      // Control de condición límite para evitar raíces de números negativos (indeterminación de contacto)
+      let radicando = Math.pow(R + rr, 2) - Math.pow(dx, 2);
+      if (radicando < 0) {
+        // Corrección dinámica forzada del offset para que el seguidor no se desconecte del perfil
+        offset = offset > 0 ? offset - 2 : offset + 2;
+        slOs.value = offset;
+        return;
+      }
+      
+      // Altura del centro del rodillo calculada rígidamente
+      let yRodillo = yc - Math.sqrt(radicando);
+
+      // Longitud total constructiva del vástago del seguidor
+      let largoVastago = 130;
+      let yCargaSuperior = yRodillo - largoVastago;
+
+      // 4. ACTUALIZACIÓN ASOCIATIVA DIRECTA DEL SVG (Garantía anti-desprendimiento)
+      // Posicionamiento geométrico de la Leva Excéntrica
+      perfilLeva.setAttribute('cx', xc);
+      perfilLeva.setAttribute('cy', yc);
+      perfilLeva.setAttribute('r', R);
+
+      // Brazo estructural interno que evidencia la excentricidad
+      brazoExcentricidad.setAttribute('x1', x0);
+      brazoExcentricidad.setAttribute('y1', y0);
+      brazoExcentricidad.setAttribute('x2', xc);
+      brazoExcentricidad.setAttribute('y2', yc);
+      centroGeometrico.setAttribute('cx', xc);
+      centroGeometrico.setAttribute('cy', yc);
+
+      // Posicionamiento de los componentes del Seguidor de Rodillo
+      rodillo.setAttribute('cx', xSeguidor);
+      rodillo.setAttribute('cy', yRodillo);
+      rodillo.setAttribute('r', rr);
+      pernoRodillo.setAttribute('cx', xSeguidor);
+      pernoRodillo.setAttribute('cy', yRodillo);
+
+      // Vástago rígido vertical
+      vastago.setAttribute('x1', xSeguidor);
+      vastago.setAttribute('y1', yRodillo);
+      vastago.setAttribute('x2', xSeguidor);
+      vastago.setAttribute('y2', yCargaSuperior);
+
+      // Terminal plana superior de carga
+      terminalCarga.setAttribute('x', xSeguidor - 25);
+      terminalCarga.setAttribute('y', yCargaSuperior - 20);
+
+      // 5. REDIMENSIONAMIENTO ADAPTATIVO DE LAS GUÍAS DE TRASLACIÓN
+      // Mover el bloque de guías fijas para centrarse síncronamente con el desfase (offset) elegido
+      guiaIzquierda.setAttribute('x', xSeguidor - 30);
+      guiaDerecha.setAttribute('x', xSeguidor + 10);
+      
+      // Línea auxiliar indicadora del desfase del eje
+      if (offset !== 0) {
+        lineaDesfaseIzq.setAttribute('style', 'display: block; stroke: #475569;');
+        lineaDesfaseIzq.setAttribute('x1', xSeguidor);
+        lineaDesfaseIzq.setAttribute('x2', xSeguidor);
+      } else {
+        lineaDesfaseIzq.setAttribute('style', 'display: none;');
+      }
+
+      // 6. TRATAMIENTO DE TELEMETRÍA Y VARIABLES FÍSICAS
+      // Alzada neta del seguidor partiendo desde su punto muerto inferior (PMI = 0 mm)
+      let pmiTeorico = y0 - (R + rr + e); 
+      let alzadaMm = Math.abs(yRodillo - pmiTeorico);
+
+      // Fuerza de contacto teórica: Simula la compresión elástica de un resorte de retorno
+      // Más la fuerza de inercia calculada mediante la aceleración aproximada del perfil circular
+      let fuerzaResorte = alzadaMm * 1.8;
+      let fuerzaInercial = velocidad * (e * Math.abs(Math.cos(rad))) * 0.4;
+      let fuerzaTotal = velocidad === 0 ? 0 : 25 + fuerzaResorte + fuerzaInercial;
+
+      // Despliegue en pantallas internas del SVG
+      txtAngulo.textContent = Math.floor(anguloMotor);
+      txtPosicion.textContent = alzadaMm.toFixed(1);
+      txtFuerza.textContent = velocidad === 0 ? "0.0" : fuerzaTotal.toFixed(1);
+
+      requestAnimationFrame(actualizarMecanismo);
+    }
+
+    // Gestor de eventos para control de ejecución de la simulación
+    btnPlayPause.addEventListener('click', () => {
+      ejecutando = !ejecutando;
+
+      if (ejecutando) {
+        btnPlayPause.textContent = "Pausar Animación";
+        btnPlayPause.style.backgroundColor = "#ef4444";
+        actualizarMecanismo();
+      } else {
+        btnPlayPause.textContent = "Iniciar Animación";
+        btnPlayPause.style.backgroundColor = "#10b981";
+      }
+    });
+
+    // Ignición inicial automática del bucle de cálculo cinemático
+    actualizarMecanismo();
+  </script>
+</body>
+</html>

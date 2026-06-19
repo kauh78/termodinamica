@@ -1,0 +1,21 @@
+﻿Actúa como un Ingeniero Mecánico experto en Didáctica y Desarrollador Frontend Senior. Requiero que generes el código completo y unificado de un simulador cinemático interactivo en un solo archivo ".html" basado en web para el mecanismo: "Inversor de Peaucellier-Lipkin para Generación de Línea Recta Pura".
+
+El diseño debe cumplir estrictamente con los siguientes requisitos estructurales, matemáticos y estéticos:
+
+1. ARQUITECTURA DE LA INTERFAZ (HTML/CSS):
+- Estilo estético "Minimalista Nórdico": Fondo general gris pizarra oscuro (#0f172a). 
+- Distribución espacial horizontal dividida en capas: El lienzo gráfico ocupará toda la mitad SUPERIOR. El panel de controles se ubicará en la mitad INFERIOR, organizado en 4 columnas paralelas y simétricas para aprovechar pantallas panorámicas.
+- Los deslizadores deben modificar las variables en tiempo real y mostrar sus valores numéricos instantáneos en un elemento <span> con color verde salvia (#2dd4bf).
+- El botón de "Pausar / Iniciar Animación" debe ubicarse como un elemento flotante en la esquina inferior derecha de la pantalla, con un diseño circular minimalista.
+
+2. ÁREA GRÁFICA (SVG):
+- Usa un lienzo SVG con un 'viewBox' ancho (0 0 1000 450) y un fondo interno gris ceniza muy oscuro (#0b0f19).
+- El entramado de eslabones simétricos del rombo se definirá con clases CSS limpias: Eslabones fijos a tierra en gris acero (#64748b), los brazos largos de control en naranja quemado (#f97316), y el rombo inversor móvil en verde menta (#2dd4bf). Deja una línea traza intermitente perpetua que marque la trayectoria rectilínea generada por el nodo terminal.
+- Integra un "Panel de Telemetría Dinámica" interno en el SVG (un <rect> sin bordes y opacidad 0.8). Debe mostrar el ángulo motriz y la desviación absoluta calculada del punto terminal respecto al eje neutro en mm (que debe mantenerse en cero).
+
+3. SCRIPT CINEMÁTICO (JAVASCRIPT):
+- Desarrollar un lazo de animación continuo basado en 'requestAnimationFrame' controlado por una variable booleana de ejecución.
+- ¡CRÍTICO PARA LA RIGIDEZ MECÁNICA!: No utilices transformaciones de rotación gráficas independientes ('transform="rotate(...)"'). Calcula analítica y trigonométricamente las coordenadas absolutas (X, Y) de los 7 nodos móviles del inversor en cada cuadro basándote en la geometría del rombo y el eslabón conductor. Redibuja de forma síncrona los atributos geométricos ('x1', 'y1', 'x2', 'y2', 'cx', 'cy') de todas las líneas utilizando estrictamente las mismas variables calculadas en memoria.
+- Aplica candados lógicos estrictos en los deslizadores para asegurar que la longitud de los brazos largos sea siempre significativamente mayor que el tamaño de las aristas del rombo interno.
+
+Entrégame únicamente el código completo, limpio y estructurado dentro de un solo bloque de código unificado, listo para guardar como archivo .html y ejecutar directamente en el navegador.

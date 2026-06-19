@@ -1,0 +1,118 @@
+<!-- Estilos para la imagen -->
+<style>
+.imagen-clickeable {
+    cursor: pointer;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 10px;
+    transition: transform 0.3s;
+    display: block;
+    margin: 20px auto;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.imagen-clickeable:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+}
+</style>
+
+<!-- IMAGEN CLICKEABLE -->
+<img src="URL_AQUI" 
+     alt="Haz clic para abrir la información"
+     class="imagen-clickeable"
+     onclick="abrirPopup()">
+
+<script>
+function abrirPopup() {
+    // Abre una ventana emergente con tu contenido
+    var ventana = window.open('', '_blank', 'width=900,height=700,scrollbars=yes,resizable=yes');
+    
+    // Escribe el contenido dentro de la ventana emergente
+    ventana.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Mi Código - Termodinámica</title>
+            <style>
+                body {
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    background: linear-gradient(135deg, #1e3c72, #2a5298);
+                    color: white;
+                    padding: 40px;
+                    margin: 0;
+                    min-height: 100vh;
+                }
+                .contenido {
+                    background: white;
+                    color: #333;
+                    padding: 35px;
+                    border-radius: 20px;
+                    max-width: 900px;
+                    margin: 0 auto;
+                    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                }
+                h1 { color: #1e3c72; border-bottom: 4px solid #1e3c72; padding-bottom: 15px; }
+                h2 { color: #2a5298; }
+                h3 { color: #c0392b; }
+                .lista-ciclos {
+                    display: grid;
+                    grid-template-columns: repeat(6, 1fr);
+                    gap: 8px;
+                    padding: 20px;
+                    background: #f8f9fa;
+                    border-radius: 15px;
+                    list-style: none;
+                }
+                .lista-ciclos li {
+                    background: #e9ecef;
+                    padding: 8px;
+                    border-radius: 5px;
+                    text-align: center;
+                    font-family: 'Courier New', monospace;
+                    font-weight: bold;
+                }
+                .equacion {
+                    background: #2c3e50;
+                    color: #ecf0f1;
+                    padding: 15px;
+                    border-radius: 10px;
+                    text-align: center;
+                    font-size: 18px;
+                    margin: 20px 0;
+                }
+                .btn-cerrar-popup {
+                    display: block;
+                    margin: 20px auto;
+                    padding: 12px 40px;
+                    background: #e74c3c;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 16px;
+                    cursor: pointer;
+                }
+                .btn-cerrar-popup:hover { background: #c0392b; }
+            </style>
+        </head>
+        <body>
+            <div class="contenido">
+                <h1>🌌 Más allá del Cero Absoluto</h1>
+                <h2>🔄 Ciclos Termodinámicos</h2>
+                <div class="equacion">⚡ CICLO DE CAMBIO (ideal) ⚡</div>
+                <h3>📊 Temperaturas del ciclo:</h3>
+                <ul class="lista-ciclos">
+                    ${Array.from({length: 100}, (_, i) => `<li>T<sub>${i+1}</sub></li>`).join('')}
+                </ul>
+                <div class="equacion" style="background: #27ae60;">
+                    📈 La termodinámica estudia la transformación de la energía
+                </div>
+                <button class="btn-cerrar-popup" onclick="window.close()">✕ Cerrar ventana</button>
+            </div>
+        </body>
+        </html>
+    `);
+    
+    ventana.document.close();
+}
+</script>

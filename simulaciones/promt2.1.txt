@@ -1,0 +1,23 @@
+﻿Actúa como un experto en desarrollo web frontend y diseño instruccional. Quiero crear una presentación interactiva en una sola página (Single Page Application) basada en un archivo HTML/CSS/JS.
+Tu objetivo:** Generar el código completo (HTML5 + CSS interno + JS) para una nueva presentación siguiendo estrictamente esta estructura y estilo, pero con contenido sobre **[INSERTAR AQUÍ EL NUEVO TEMA, EJ: Ciclos de Potencia]**.
+Reglas de Diseño y Estructura que DEBES mantener:**
+1. Contenedor Principal:** Mantén la clase `.presentation` con el estilo de tarjeta centralizada, sombras y bordes redondeados, utilizando el formato de diapositivas tipo carrusel con transiciones de opacidad.
+2. Estilo Visual:** Mantén la paleta de colores actual pero permite que el usuario pueda cambiarla. **[INSERTAR AQUÍ TUS PREFERENCIAS DE COLOR, EJ: Usa tonos azul cobalto y verde neón]**.
+3. Componentes Interactivos:**
+ * Mantén las tarjetas (`.card`) con el efecto `backdrop-filter: blur`, el `hover` de elevación y el icono de enlace en la esquina superior derecha.
+ * Conserva el sistema de navegación inferior (botones `prev`/`next` y contador).
+ * Si el tema incluye una sección de 'detalle expandido' (como la Ley Cero), mantén la estructura de `vista-ley-expandida` con sus animaciones CSS de entrada.
+
+ 
+ 4. Animaciones:** Conserva intactas todas las animaciones definidas en los `@keyframes` (`balanceoBirrete`, `pulsoBorla`, `aparecerBirrete`, `flotar`). No modifiques las curvas de tiempo de transición.
+ 5. Personalización de Layout:** Quiero que los elementos sean flexibles. **[INSERTAR AQUÍ TUS CAMBIOS, EJ: Cambia la ubicación de los botones de navegación a la parte superior derecha y las tarjetas de la diapositiva 2 a un grid de 3 columnas]**.
+ 
+ 
+ **Contenido Requerido:**
+ * Diapositiva 1: Portada impactante.
+ * Diapositiva 2: Agenda con al menos 6 puntos clave del nuevo tema.
+ * Diapositivas 3-9: Desarrollo técnico del tema, usando los iconos de FontAwesome (`fas`) adecuados para cada sección.
+ * Diapositiva 10: Sección de evaluación final con el sistema de 'birrete' animado.
+ 
+ 
+ Por favor, asegúrate de que el código sea limpio, responsivo para dispositivos móviles y que los estilos CSS estén integrados correctamente en el documento para que pueda copiar, pegar y ejecutar directamente."

@@ -1,0 +1,376 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulador Cinemático Virtual: Mecanismo Whitworth</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      background-color: #020617;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #f8fafc;
+      overflow: hidden;
+      display: flex;
+      flex-direction: row;
+    }
+
+    /* ARQUITECTURA DE LA INTERFAZ: PANEL LATERAL IZQUIERDO */
+    #panel-controles {
+      width: 340px;
+      height: 100%;
+      background-color: #0f172a;
+      border-right: 3px solid #f43f5e;
+      box-shadow: 4px 0 20px rgba(244, 63, 94, 0.15);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      z-index: 10;
+      overflow-y: auto;
+    }
+
+    .titulo-panel {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #f43f5e;
+      border-bottom: 1px solid rgba(244, 63, 94, 0.2);
+      padding-bottom: 8px;
+      margin-bottom: 4px;
+    }
+
+    .control-group {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #94a3b8;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    label span {
+      color: #facc15;
+      font-family: monospace;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      cursor: pointer;
+      accent-color: #f43f5e;
+      background: rgba(255, 255, 255, 0.05);
+      height: 6px;
+      border-radius: 3px;
+      appearance: none;
+    }
+
+    .contenedor-boton {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    .btn-control {
+      width: 100%;
+      padding: 14px 20px;
+      border: 2px solid #a855f7;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      background: rgba(168, 85, 247, 0.1);
+      color: #a855f7;
+      box-shadow: 0 0 10px rgba(168, 85, 247, 0.2);
+    }
+
+    .btn-control:hover {
+      background: rgba(168, 85, 247, 0.2);
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+    }
+
+    .btn-control.activo {
+      border-color: #10b981;
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.1);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+    }
+
+    /* Lienzo Gráfico Derecho */
+    #canvas-container {
+      flex: 1;
+      height: 100%;
+      position: relative;
+      background-color: #020617;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      max-width: 1000px;
+      max-height: 750px;
+      background: #020617;
+      border: 1px solid rgba(255, 255, 255, 0.02);
+    }
+
+    /* CLASES DE ESTILO ESTRUCTURALES SVG */
+    .linea-eje { stroke: #1e293b; stroke-width: 1.5; stroke-dasharray: 6,4; }
+    .bancada { fill: #1e293b; stroke: #475569; stroke-width: 2; stroke-linejoin: round; }
+    .manivela-motriz { stroke: #f43f5e; stroke-width: 7; stroke-linecap: round; }
+    .brazo-oscilante { stroke: #a855f7; stroke-width: 6; stroke-linecap: round; }
+    .biela-acoplamiento { stroke: #3b82f6; stroke-width: 4; stroke-linecap: round; }
+    .ariete-herramienta { fill: rgba(6, 182, 212, 0.15); stroke: #06b6d4; stroke-width: 3; stroke-linejoin: round; }
+    .guias-adaptativas { stroke: #334155; stroke-width: 3; stroke-linecap: square; stroke-dasharray: 8,4; }
+    .colisa-deslizante { fill: #475569; stroke: #f43f5e; stroke-width: 1.5; rx: 4; }
+    .perno { fill: #ffffff; stroke: #0f172a; stroke-width: 2; }
+    .centro-fijo { fill: #0f172a; stroke: #94a3b8; stroke-width: 2; }
+    .trayectoria { stroke: rgba(244, 63, 94, 0.15); stroke-width: 1.5; stroke-dasharray: 4,4; }
+  </style>
+</head>
+<body>
+
+  <div id="panel-controles">
+    <div class="titulo-panel">Control Operacional</div>
+    
+    <div class="contenedor-boton">
+      <button id="btn-play-pause" class="btn-control activo">Pausar Animación</button>
+    </div>
+
+    <div class="titulo-panel">Parámetros de Diseño</div>
+
+    <div class="control-group">
+      <label>Distancia Centros (CD): <span id="val-d">50</span> mm</label>
+      <input type="range" id="sl-d" min="30" max="80" value="50" step="1">
+    </div>
+
+    <div class="control-group">
+      <label>Radio Manivela (R): <span id="val-r">95</span> mm</label>
+      <input type="range" id="sl-r" min="85" max="140" value="95" step="1">
+    </div>
+
+    <div class="control-group">
+      <label>Longitud del Brazo (L): <span id="val-l">220</span> mm</label>
+      <input type="range" id="sl-l" min="180" max="280" value="220" step="1">
+    </div>
+
+    <div class="control-group">
+      <label>Velocidad Motor (&omega;): <span id="val-w">1.2</span> rad/s</label>
+      <input type="range" id="sl-w" min="0.2" max="3.0" value="1.2" step="0.1">
+    </div>
+  </div>
+
+  <div id="canvas-container">
+    <svg id="simulador-svg" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet">
+      
+      <line id="eje-vertical" x1="530" y1="50" x2="530" y2="550" class="linea-eje" />
+      <line id="linea-guia-ariete" x1="250" y1="120" x2="780" y2="120" class="linea-eje" />
+      <circle id="trayectoria-r" cx="530" cy="420" r="95" class="trayectoria" />
+      
+      <line id="guia-sup" x1="300" y1="100" x2="760" y2="100" class="guias-adaptativas" />
+      <line id="guia-inf" x1="300" y1="140" x2="760" y2="140" class="guias-adaptativas" />
+
+      <path id="bancada-c" d="M 515 420 L 545 420 L 530 445 Z" class="bancada" />
+      <path id="bancada-d" d="M 515 370 L 545 370 L 530 395 Z" class="bancada" />
+
+      <line id="link-manivela" x1="530" y1="420" x2="530" y2="325" class="manivela-motriz" />
+      <line id="link-brazo" x1="530" y1="370" x2="530" y2="180" class="brazo-oscilante" />
+      <line id="link-biela" x1="530" y1="180" x2="680" y2="120" class="biela-acoplamiento" />
+
+      <rect id="colisa-bloque" x="518" y="313" width="24" height="24" class="colisa-deslizante" />
+
+      <polygon id="ariete" points="630,105 730,105 730,135 630,135" class="ariete-herramienta" />
+
+      <circle id="pivot-c" cx="530" cy="420" r="6" class="centro-fijo" />
+      <circle id="pivot-d" cx="530" cy="370" r="6" class="centro-fijo" />
+      <circle id="node-a" cx="530" cy="325" r="5" class="perno" />
+      <circle id="node-b" cx="530" cy="180" r="5" class="perno" />
+      <circle id="node-p" cx="680" cy="120" r="5" class="perno" />
+
+      <g id="telemetria" transform="translate(-50, 370)">
+        <rect x="0" y="0" width="340" height="210" rx="12" fill="#0b1329" opacity="0.95" stroke="#06b6d4" stroke-width="1.5" />
+        <text x="24" y="35" fill="#94a3b8" font-family="monospace" font-size="13" font-weight="bold" letter-spacing="1">TELEMETRÍA DE DIAGNÓSTICO</text>
+        <line x1="24" y1="48" x2="316" y2="48" stroke="rgba(6, 182, 212, 0.2)" stroke-width="1.5" />
+        
+        <text x="24" y="88" fill="#f8fafc" font-family="monospace" font-size="18">Ángulo Entrada: <tspan id="tel-theta" fill="#f43f5e" font-weight="bold">0.0</tspan> °</text>
+        <text x="24" y="130" fill="#f8fafc" font-family="monospace" font-size="18">Carrera Actuador: <tspan id="tel-pos" fill="#06b6d4" font-weight="bold">0.0</tspan> mm</text>
+        <text x="24" y="172" fill="#f8fafc" font-family="monospace" font-size="18">Velocidad Lineal: <tspan id="tel-vel" fill="#a855f7" font-weight="bold">0.0</tspan> mm/s</text>
+      </g>
+    </svg>
+  </div>
+
+  <script>
+    const slD = document.getElementById('sl-d');
+    const slR = document.getElementById('sl-r');
+    const slL = document.getElementById('sl-l');
+    const slW = document.getElementById('sl-w');
+
+    const valD = document.getElementById('val-d');
+    const valR = document.getElementById('val-r');
+    const valL = document.getElementById('val-l');
+    const valW = document.getElementById('val-w');
+
+    const btnPlayPause = document.getElementById('btn-play-pause');
+
+    const linkManivela = document.getElementById('link-manivela');
+    const linkBrazo = document.getElementById('link-brazo');
+    const linkBiela = document.getElementById('link-biela');
+    const colisaBloque = document.getElementById('colisa-bloque');
+    const ariete = document.getElementById('ariete');
+    const trayectoriaR = document.getElementById('trayectoria-r');
+    
+    const guiaSup = document.getElementById('guia-sup');
+    const guiaInf = document.getElementById('guia-inf');
+    const bancadaD = document.getElementById('bancada-d');
+    const ejeVertical = document.getElementById('eje-vertical');
+    const lineaGuiaAriete = document.getElementById('linea-guia-ariete');
+
+    const pivotC = document.getElementById('pivot-c');
+    const pivotD = document.getElementById('pivot-d');
+    const nodeA = document.getElementById('node-a');
+    const nodeB = document.getElementById('node-b');
+    const nodeP = document.getElementById('node-p');
+
+    const telTheta = document.getElementById('tel-theta');
+    const telPos = document.getElementById('tel-pos');
+    const telVel = document.getElementById('tel-vel');
+
+    let theta = 0; 
+    let ejecutando = true;
+    let ultimaActualizacion = performance.now();
+    let posicionAnteriorX = 0;
+
+    // Nuevo punto de origen descentrado a la derecha (x=530) para evitar colisiones
+    const xC = 530;
+    const yC = 420;
+    const yLinealAriete = 120;
+
+    function actualizarSimulacion(ahora) {
+      let d = parseFloat(slD.value);
+      let r = parseFloat(slR.value);
+      let L = parseFloat(slL.value);
+      let w = parseFloat(slW.value);
+
+      if (d >= r - 10) {
+        d = r - 10;
+        slD.value = d;
+      }
+
+      valD.textContent = d;
+      valR.textContent = r;
+      valL.textContent = L;
+      valW.textContent = w.toFixed(1);
+
+      trayectoriaR.setAttribute('r', r);
+      let yD = yC - d;
+      pivotD.setAttribute('cy', yD);
+      bancadaD.setAttribute('d', `M ${xC - 15} ${yD} L ${xC + 15} ${yD} L ${xC} ${yD + 25} Z`);
+
+      let dt = (ahora - ultimaActualizacion) / 1000;
+      ultimaActualizacion = ahora;
+
+      if (ejecutando) {
+        theta += w * dt * 2.5;
+        if (theta > Math.PI * 2) theta -= Math.PI * 2;
+      }
+
+      let xA = xC + r * Math.sin(theta);
+      let yA = yC - r * Math.cos(theta);
+
+      let alpha = Math.atan2(xA - xC, yD - yA);
+
+      let xB = xC + L * Math.sin(alpha);
+      let yB = yD - L * Math.cos(alpha);
+
+      const longitudBiela = 180; 
+
+      let dyBiela = yLinealAriete - yB;
+      let dxBiela = Math.sqrt(Math.max(0, (longitudBiela * longitudBiela) - (dyBiela * dyBiela)));
+      
+      let xP = (xB >= xC) ? xB + dxBiela : xB - dxBiela;
+
+      linkManivela.setAttribute('x2', xA);
+      linkManivela.setAttribute('y2', yA);
+
+      colisaBloque.setAttribute('x', xA - 12);
+      colisaBloque.setAttribute('y', yA - 12);
+
+      linkBrazo.setAttribute('y1', yD);
+      linkBrazo.setAttribute('x2', xB);
+      linkBrazo.setAttribute('y2', yB);
+
+      linkBiela.setAttribute('x1', xB);
+      linkBiela.setAttribute('y1', yB);
+      linkBiela.setAttribute('x2', xP);
+
+      nodeA.setAttribute('cx', xA); nodeA.setAttribute('cy', yA);
+      nodeB.setAttribute('cx', xB); nodeB.setAttribute('cy', yB);
+      nodeP.setAttribute('cx', xP);
+
+      ariete.setAttribute('points', `${xP - 50},105 ${xP + 50},105 ${xP + 50},135 ${xP - 50},135`);
+
+      let alphaMax = Math.asin(r / d); 
+      let xExtremoMax = xC + L * Math.sin(alphaMax) + longitudBiela;
+      let xExtremoMin = xC - L * Math.sin(alphaMax) - longitudBiela;
+      let holguraFija = 40;
+
+      guiaSup.setAttribute('x1', xExtremoMin - holguraFija);
+      guiaSup.setAttribute('x2', xExtremoMax + holguraFija);
+      guiaInf.setAttribute('x1', xExtremoMin - holguraFija);
+      guiaInf.setAttribute('x2', xExtremoMax + holguraFija);
+      lineaGuiaAriete.setAttribute('x1', xExtremoMin - holguraFija - 50);
+      lineaGuiaAriete.setAttribute('x2', xExtremoMax + holguraFija + 50);
+
+      if (dt > 0) {
+        let velocidadLineal = (xP - posicionAnteriorX) / dt;
+        if(Math.abs(velocidadLineal) > 2000) velocidadLineal = 0;
+        
+        telVel.textContent = velocidadLineal.toFixed(1);
+        posicionAnteriorX = xP;
+      }
+
+      let thetaGrados = (theta * 180 / Math.PI).toFixed(0);
+      let carreraRelativa = (xP - (xC - L)).toFixed(1);
+
+      telTheta.textContent = thetaGrados;
+      telPos.textContent = carreraRelativa;
+
+      requestAnimationFrame(actualizarSimulacion);
+    }
+
+    btnPlayPause.addEventListener('click', () => {
+      ejecutando = !ejecutando;
+      if (ejecutando) {
+        btnPlayPause.textContent = "Pausar Animación";
+        btnPlayPause.classList.add('activo');
+      } else {
+        btnPlayPause.textContent = "Iniciar Animación";
+        btnPlayPause.classList.remove('activo');
+      }
+    });
+
+    requestAnimationFrame(actualizarSimulacion);
+  </script>
+</body>
+</html>

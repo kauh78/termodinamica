@@ -1,0 +1,23 @@
+Actúa como un Ingeniero Mecánico experto en Didáctica y Desarrollador Frontend Senior. Requiero que generes el código completo y unificado de un simulador cinemático interactivo en un solo archivo ".html" basado en web para el mecanismo: [INSERTAR NOMBRE DEL MECANISMO AQUÍ, EJ: Cuatro Barras, Yugo Escocés, Leva-Seguidor].
+
+El diseño debe cumplir estrictamente con los siguientes requisitos estructurales, matemáticos y estéticos:
+
+1. ARQUITECTURA DE LA INTERFAZ (HTML/CSS):
+- Diseño responsivo con un contenedor principal translúcido usando 'backdrop-filter: blur(10px)' y bordes suaves, sobre un fondo general con un degradado lineal oscuro de estilo industrial (ej. de #0f172a a #1e1b4b).
+- División en dos secciones principales: Un área gráfica a la izquierda para el lienzo SVG y un panel de controles lateral a la derecha (#1e293b) con etiquetas claras en alto contraste (#cbd5e1).
+- Los deslizadores (inputs tipo range) deben modificar las variables geométricas clave en tiempo real (ej. longitudes de eslabones, velocidades, excentricidades). Cada control debe mostrar su valor numérico instantáneo en un elemento <span> con color cyan (#38bdf8).
+- Incluye un botón dinámico de "Pausar / Iniciar Animación" al fondo del panel de control que alterne su estado lógico, color y texto mediante eventos de clic.
+
+2. ÁREA GRÁFICA (SVG):
+- Usa un lienzo SVG con un 'viewBox' adecuado (ej. 0 0 800 500) y un fondo interno muy oscuro (#090d16) para simular un entorno de CAD o modo oscuro.
+- Todos los eslabones y componentes estructurales fijos o móviles deben definirse con clases CSS limpias, usando colores saturados de alta visibilidad (ej. Manivelas en coral #f43f5e, bielas/acopladores en cian #38bdf8, elementos deslizantes o seguidores en verde esmeralda #10b981).
+- Integra un "Panel de Telemetría Dinámica" interno en el SVG (un <rect> oscuro con opacidad 0.9) ubicado estratégicamente. Este cuadro debe mostrar etiquetas claras y valores de texto dinámicos (<tspan>) con fuentes monoespaciadas legibles y escaladas (font-size: 14px) para desplegar variables como ángulo del motor, posiciones relativas en mm y una fuerza teórica simulada.
+
+3. SCRIPT CINEMÁTICO (JAVASCRIPT):
+- Desarrollar un lazo de animación continuo basado en 'requestAnimationFrame' controlado por una variable booleana de ejecución (vinculada al botón de pausa).
+- ¡CRÍTICO PARA LA RIGIDEZ MECÁNICA!: No utilices transformaciones de rotación gráficas independientes ('transform="rotate(...)"') en los eslabones intermedios o acoplados, ya que esto desvincula los pernos en valores extremos. En su lugar, calcula trigonométricamente las coordenadas absolutas (X, Y) de cada nodo o articulación en cada cuadro de animación basándote en el avance del ángulo motor.
+- Redibuja de forma síncrona los atributos geométricos ('x1', 'y1', 'x2', 'y2', 'cx', 'cy') de las líneas y círculos utilizando estrictamente las mismas variables calculadas en memoria, garantizando que los pernos permanezcan solidarios y el mecanismo nunca se desarme.
+- Aplica candados lógicos o restricciones geométricas en los deslizadores para evitar que el usuario seleccione dimensiones físicamente imposibles o indeterminaciones matemáticas (ej. que la biela sea más corta que el radio de la manivela).
+- Las paredes o guías del bloque del mecanismo deben ser adaptativas: calcula analíticamente sus dimensiones de forma que cambien su ancho o posición en tiempo real para ajustarse exactamente a la carrera o recorrido extremo del mecanismo con una holgura fija.
+
+Entrégame únicamente el código completo, limpio y estructurado dentro de un solo bloque de código unificado, listo para guardar como archivo .html y ejecutar directamente en el navegador.

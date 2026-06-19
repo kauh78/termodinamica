@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propiedades Intensivas y Extensivas en Termodinámica</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ==========================================
+           CONFIGURACIÓN DE COLORES - MODIFICAR AQUÍ
+           ========================================== */
+        :root {
+            /* COLOR DE FONDO */
+            --bg-primary: #f0f4f8;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-reflection: #e0f2fe;
+            
+            /* COLOR DE TÍTULOS */
+            --color-titles: #1e3a5f;
+            --color-subtitles: #334155;
+            
+            /* COLOR DE BOTONES */
+            --color-buttons: #0ea5e9;
+            --color-buttons-hover: #0284c7;
+            
+            /* COLOR DE LETRA */
+            --color-text: #334155;
+            --color-text-light: #64748b;
+            --color-accent: #0ea5e9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--color-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ==========================================
+           HEADER Y TÍTULO PRINCIPAL
+           ========================================== */
+        .hero {
+            background: linear-gradient(135deg, var(--color-titles) 0%, var(--color-accent) 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></svg>');
+            opacity: 0.3;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+            font-weight: 300;
+            opacity: 0.95;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ==========================================
+           CONTENEDOR PRINCIPAL
+           ========================================== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+        }
+
+        /* ==========================================
+           GRID DE TARJETAS
+           ========================================== */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2.5rem;
+            margin-bottom: 3rem;
+        }
+
+        @media (min-width: 768px) {
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card h2 {
+            color: var(--color-titles);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .card p {
+            margin-bottom: 1rem;
+            text-align: justify;
+        }
+
+        /* Recuadro técnico */
+        .tech-box {
+            background: var(--bg-primary);
+            border-left: 4px solid var(--color-accent);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .tech-box h3 {
+            color: var(--color-titles);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tech-box p {
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            color: var(--color-text);
+            margin: 0;
+        }
+
+        /* Comparación con fenómeno natural */
+        .nature-comparison {
+            background: linear-gradient(to right, #ecfdf5, #d1fae5);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border: 2px solid #6ee7b7;
+        }
+
+        .nature-comparison h4 {
+            color: #047857;
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nature-comparison p {
+            color: #065f46;
+            margin: 0;
+            font-style: italic;
+        }
+
+        /* Curiosidades */
+        .curiosity {
+            background: #fef3c7;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: auto;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .curiosity strong {
+            color: #92400e;
+            display: block;
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .curiosity p {
+            color: #78350f;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        /* ==========================================
+           SECCIÓN DE REFLEXIÓN
+           ========================================== */
+        .reflection-section {
+            background: var(--bg-reflection);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            margin: 3rem 0;
+            text-align: center;
+            border: 2px solid #bae6fd;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .reflection-section::before {
+            content: '"';
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            font-size: 150px;
+            color: var(--color-accent);
+            opacity: 0.1;
+            font-family: Georgia, serif;
+        }
+
+        .reflection-section h2 {
+            color: var(--color-titles);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .reflection-section p {
+            font-size: 1.25rem;
+            color: var(--color-subtitles);
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.8;
+            font-weight: 300;
+        }
+
+        /* ==========================================
+           ZONA DE PREGUNTAS IA
+           ========================================== */
+        .questions-section {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            margin: 3rem 0;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .questions-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .questions-header h2 {
+            color: var(--color-titles);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .questions-header p {
+            color: var(--color-text-light);
+        }
+
+        .question-bank {
+            display: grid;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .question-item {
+            background: var(--bg-primary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--color-accent);
+        }
+
+        .question-item h3 {
+            color: var(--color-titles);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .question-item p {
+            color: var(--color-text);
+            font-size: 0.95rem;
+        }
+
+        /* Pregunta activa con IA */
+        .active-question {
+            background: white;
+            border: 2px solid var(--color-accent);
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+        }
+
+        .active-question h3 {
+            color: var(--color-titles);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            color: var(--color-subtitles);
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--bg-primary);
+            border-radius: 8px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            resize: vertical;
+            transition: border-color 0.3s;
+            margin-bottom: 1rem;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--color-accent);
+        }
+
+        .btn {
+            background: var(--color-buttons);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background: var(--color-buttons-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+        }
+
+        .feedback-box {
+            display: none;
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: #f0fdf4;
+            border: 2px solid #86efac;
+            border-radius: 12px;
+            animation: slideIn 0.5s ease;
+        }
+
+        .feedback-box.show {
+            display: block;
+        }
+
+        .feedback-box h4 {
+            color: #166534;
+            margin-bottom: 0.5rem;
+        }
+
+        .feedback-box p {
+            color: #166534;
+            line-height: 1.6;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ==========================================
+           BIRRETE FLOTANTE (GAMIFICACIÓN)
+           ========================================== */
+        .graduation-cap {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, #fcd34d 0%, #f59e0b 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 150px;
+            box-shadow: 0 10px 40px rgba(245, 158, 11, 0.4);
+            opacity: 0;
+            transform: scale(0);
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .graduation-cap.show {
+            animation: popIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        }
+
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: scale(0) rotate(-180deg);
+            }
+            50% {
+                transform: scale(1.2) rotate(10deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        .cap-text {
+            position: absolute;
+            bottom: 60px;
+            color: #78350f;
+            font-weight: 700;
+            font-size: 1.2rem;
+            text-align: center;
+            width: 100%;
+            text-shadow: 0 2px 4px rgba(255,255,255,0.5);
+        }
+
+        /* ==========================================
+           FOOTER
+           ========================================== */
+        footer {
+            background: var(--color-titles);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        footer p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* ==========================================
+           RESPONSIVE
+           ========================================== */
+        @media (max-width: 768px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .graduation-cap {
+                width: 200px;
+                height: 200px;
+                font-size: 100px;
+                bottom: 10px;
+                right: 10px;
+            }
+            
+            .cap-text {
+                font-size: 0.9rem;
+                bottom: 40px;
+            }
+            
+            .reflection-section {
+                padding: 2rem 1rem;
+            }
+            
+            .reflection-section::before {
+                font-size: 100px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Utilidades */
+        .highlight {
+            background: linear-gradient(120deg, #fef08a 0%, #fef08a 100%);
+            background-repeat: no-repeat;
+            background-size: 100% 40%;
+            background-position: 0 88%;
+            padding: 0 4px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HERO SECTION -->
+    <header class="hero">
+        <h1>Propiedades Intensivas y Extensivas</h1>
+        <p class="subtitle">Comprende la naturaleza fundamental de la materia a través de las propiedades termodinámicas que definen los sistemas físicos y su comportamiento energético</p>
+    </header>
+
+    <main class="container">
+
+        <!-- GRID DE TARJETAS -->
+        <div class="cards-grid">
+
+            <!-- TARJETA 1: CONCEPTOS BÁSICOS -->
+            <article class="card">
+                <div class="card-image">
+                    <!-- REEMPLAZAR URL DE IMAGEN AQUÍ -->
+                    <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&h=600&fit=crop" alt="Sistema termodinámico">
+                </div>
+                <div class="card-content">
+                    <h2>Definición Fundamental</h2>
+                    <p>En termodinámica, las propiedades de un sistema se clasifican según su dependencia de la cantidad de materia presente. Esta distinción es crucial para el análisis de procesos energéticos y el diseño de equipos industriales.</p>
+                    
+                    <p>Las <span class="highlight">propiedades extensivas</span> son aquellas cuyo valor depende directamente de la masa o tamaño del sistema. Si dividimos el sistema en partes, el valor total es la suma de los valores de cada parte. Ejemplos clásicos incluyen la masa, el volumen, la energía interna y la entropía.</p>
+                    
+                    <p>Por otro lado, las <span class="highlight">propiedades intensivas</span> son independientes de la cantidad de materia. Su valor es el mismo en cualquier porción del sistema en equilibrio. La temperatura, la presión y la densidad son ejemplos paradigmáticos.</p>
+
+                    <div class="tech-box">
+                        <h3>📊 Detalle Técnico</h3>
+                        <p>Matemáticamente, si X es una propiedad extensiva: X(sistema total) = Σ X(partes)<br><br>
+                        Si Y es intensiva: Y(sistema total) = Y(cualquier parte) en equilibrio</p>
+                    </div>
+
+                    <div class="nature-comparison">
+                        <h4>🌊 Fenómeno Natural: El Océano</h4>
+                        <p>Imagina el océano: su <strong>volumen total</strong> (extensiva) depende de cuánta agua contiene, pero la <strong>salinidad</strong> (intensiva) es la misma en una gota que en todo el mar (en equilibrio). Así como el volumen del océano cambia con las mareas, la salinidad permanece constante localmente.</p>
+                    </div>
+
+                    <div class="curiosity">
+                        <strong>💡 Curiosidad</strong>
+                        <p>El agua del Mar Muerto tiene una salinidad de 34% (intensiva), casi 10 veces mayor que el océano promedio, pero si tomas un litro o un millón de litros, la salinidad se mantiene igual.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- TARJETA 2: PROPIEDADES EXTENSIVAS -->
+            <article class="card">
+                <div class="card-image">
+                    <!-- REEMPLAZAR URL DE IMAGEN AQUÍ -->
+                    <img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&h=600&fit=crop" alt="Propiedades extensivas">
+                </div>
+                <div class="card-content">
+                    <h2>Propiedades Extensivas en Detalle</h2>
+                    <p>Las propiedades extensivas son aditivas por naturaleza. Cuando combinamos dos sistemas, sus propiedades extensivas se suman algebraicamente. Esta característica es fundamental para realizar balances de masa y energía en procesos industriales.</p>
+
+                    <p><strong>Masa (m):</strong> La cantidad de materia presente. Es la propiedad extensiva más básica y se conserva en sistemas cerrados.</p>
+                    
+                    <p><strong>Volumen (V):</strong> El espacio tridimensional que ocupa el sistema. En gases, es altamente dependiente de la presión y temperatura.</p>
+
+                    <p><strong>Energía Interna (U):</strong> La suma de todas las formas de energía microscópica (cinética y potencial de las moléculas). Es crucial para la Primera Ley de la Termodinámica.</p>
+
+                    <div class="tech-box">
+                        <h3>⚡ Detalle Técnico</h3>
+                        <p>Homogeneidad de primer orden: Si multiplicamos la masa del sistema por un factor λ, todas las propiedades extensivas se multiplican por λ:<br>
+                        m' = λm → V' = λV, U' = λU, S' = λS</p>
+                    </div>
+
+                    <div class="nature-comparison">
+                        <h4>🏔️ Fenómeno Natural: Acumulación Glaciar</h4>
+                        <p>Un glaciar acumula hielo año tras año. Su <strong>masa total</strong> y <strong>volumen</strong> (extensivas) crecen con cada nevada, pero la <strong>temperatura</strong> del hielo (intensiva) se mantiene cerca de 0°C en la superficie, independientemente de si el glaciar tiene 1 km³ o 1000 km³.</p>
+                    </div>
+
+                    <div class="curiosity">
+                        <strong>💡 Curiosidad</strong>
+                        <p>El glaciar Vatnajökull en Islandia tiene un volumen de 3,100 km³ (extensiva), pero su densidad de hielo (~917 kg/m³, intensiva) es la misma que la de un cubito de hielo en tu bebida.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- TARJETA 3: PROPIEDADES INTENSIVAS -->
+            <article class="card">
+                <div class="card-image">
+                    <!-- REEMPLAZAR URL DE IMAGEN AQUÍ -->
+                    <img src="https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&h=600&fit=crop" alt="Propiedades intensivas">
+                </div>
+                <div class="card-content">
+                    <h2>Propiedades Intensivas y Equilibrio</h2>
+                    <p>Las propiedades intensivas definen el estado termodinámico local de un sistema y son las que determinan la dirección de los procesos espontáneos. Son esenciales para definir el equilibrio térmico, mecánico y químico.</p>
+
+                    <p><strong>Temperatura (T):</strong> Mide la energía cinética promedio de las partículas. Es el potencial termodinámico que determina la dirección del flujo de calor.</p>
+
+                    <p><strong>Presión (P):</strong> Fuerza por unidad de área. En fluidos en reposo, es isotrópica (igual en todas direcciones).</p>
+
+                    <p><strong>Densidad (ρ):</strong> Masa por unidad de volumen (ρ = m/V). Es una propiedad intensiva derivada de dos extensivas.</p>
+
+                    <div class="tech-box">
+                        <h3>🔬 Detalle Técnico</h3>
+                        <p>Relación fundamental: Las propiedades intensivas pueden obtenerse como derivadas parciales de propiedades extensivas:<br>
+                        T = (∂U/∂S)_V,n<br>
+                        P = -(∂U/∂V)_S,n<br>
+                        μ = (∂U/∂n)_S,V (potencial químico)</p>
+                    </div>
+
+                    <div class="nature-comparison">
+                        <h4>🌡️ Fenómeno Natural: Punto de Ebullición en la Montaña</h4>
+                        <p>El agua hierve a 100°C al nivel del mar, pero a 3,000 m de altitud hierve a ~90°C. La <strong>temperatura de ebullición</strong> (intensiva) cambia con la presión atmosférica, pero es la misma para una taza o una olla gigante a esa altitud. La cantidad de agua (extensiva) no afecta la temperatura de ebullición.</p>
+                    </div>
+
+                    <div class="curiosity">
+                        <strong>💡 Curiosidad</strong>
+                        <p>En el Monte Everest (8,848 m), el agua hierve a 71°C. Por eso cocinar pasta allí toma el doble de tiempo: el agua hierve "más fría" aunque tenga la misma temperatura en toda la olla.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- TARJETA 4: PROPIEDADES ESPECÍFICAS -->
+            <article class="card">
+                <div class="card-image">
+                    <!-- REEMPLAZAR URL DE IMAGEN AQUÍ -->
+                    <img src="https://images.unsplash.com/photo-1581093458791-9f3c3900df4b?w=800&h=600&fit=crop" alt="Propiedades específicas">
+                </div>
+                <div class="card-content">
+                    <h2>Propiedades Específicas y Molares</h2>
+                    <p>Una forma elegante de convertir propiedades extensivas en intensivas es dividirlas por la masa o el número de moles. Esto genera las <strong>propiedades específicas</strong> (por unidad de masa) o <strong>propiedades molares</strong> (por mol).</p>
+
+                    <p><strong>Volumen específico (v):</strong> v = V/m (m³/kg). Es el inverso de la densidad.</p>
+
+                    <p><strong>Energía interna específica (u):</strong> u = U/m. Fundamental en tablas termodinámicas de vapor y refrigerantes.</p>
+
+                    <p><strong>Entalpía específica (h):</strong> h = u + Pv. Crucial para análisis de turbinas, compresores y intercambiadores de calor.</p>
+
+                    <div class="tech-box">
+                        <h3>📐 Detalle Técnico</h3>
+                        <p>Conversión entre bases:<br>
+                        Propiedad molar = Propiedad específica × Masa molar<br>
+                        Ej: h_molar (kJ/kmol) = h_específica (kJ/kg) × M (kg/kmol)</p>
+                    </div>
+
+                    <div class="nature-comparison">
+                        <h4>☁️ Fenómeno Natural: Densidad Atmosférica</h4>
+                        <p>La atmósfera terrestre tiene una masa total enorme (extensiva: ~5.15×10¹⁸ kg), pero su <strong>densidad</strong> (intensiva) disminuye exponencialmente con la altitud. A nivel del mar: 1.225 kg/m³; a 10,000 m: 0.413 kg/m³. Esta variación intensiva determina por qué los aviones necesitan cabinas presurizadas.</p>
+                    </div>
+
+                    <div class="curiosity">
+                        <strong>💡 Curiosidad</strong>
+                        <p>El aire que respiras tiene una densidad de ~1.2 kg/m³, pero si comprimes todo el aire de la atmósfera a presión nivel del mar, formaría una capa de solo 8 km de espesor (la altura del Everest).</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- TARJETA 5: APLICACIONES PRÁCTICAS -->
+            <article class="card">
+                <div class="card-image">
+                    <!-- REEMPLAZAR URL DE IMAGEN AQUÍ -->
+                    <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&h=600&fit=crop" alt="Aplicaciones prácticas">
+                </div>
+                <div class="card-content">
+                    <h2>Aplicaciones en Ingeniería</h2>
+                    <p>La distinción entre propiedades intensivas y extensivas es vital en el diseño de procesos químicos, plantas de potencia y sistemas de refrigeración. Los ingenieros utilizan esta clasificación para escalar procesos de laboratorio a planta industrial.</p>
+
+                    <p><strong>Escalamiento de procesos:</strong> Si un reactor de 1 L produce 100 g de producto, uno de 1000 L (extensiva: volumen) producirá 100 kg, manteniendo la misma temperatura y presión (intensivas) de operación.</p>
+
+                    <p><strong>Balances de energía:</strong> En una turbina de vapor, el trabajo total (extensivo) depende del flujo másico, pero la eficiencia (intensiva) es independiente del tamaño de la turbina.</p>
+
+                    <div class="tech-box">
+                        <h3>⚙️ Detalle Técnico</h3>
+                        <p>Regla de las fases de Gibbs: F = C - P + 2<br>
+                        Donde F = grados de libertad (variables intensivas independientes), C = componentes, P = fases. Esto determina cuántas propiedades intensivas debemos especificar para definir completamente un sistema.</p>
+                    </div>
+
+                    <div class="nature-comparison">
+                        <h4>🌪️ Fenómeno Natural: Convección Atmosférica</h4>
+                        <p>En una tormenta, el aire caliente asciende y el frío desciende. La <strong>temperatura</strong> (intensiva) del aire determina su densidad y flotabilidad, mientras que el <strong>volumen total</strong> de la tormenta (extensiva) puede crecer de kilómetros a cientos de kilómetros. La intensidad del fenómeno depende de diferencias de temperatura, no del tamaño de la nube.</p>
+                    </div>
+
+                    <div class="curiosity">
+                        <strong>💡 Curiosidad</strong>
+                        <p>Un cumulonimbo (nube de tormenta) puede contener 500,000 toneladas de agua (extensiva), pero las gotas individuales tienen el mismo tamaño (~0.02 mm) independientemente del tamaño de la nube.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- TARJETA 6: RELACIÓN MATEMÁTICA -->
+            <article class="card">
+                <div class="card-image">
+                    <!-- REEMPLAZAR URL DE IMAGEN AQUÍ -->
+                    <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&h=600&fit=crop" alt="Relación matemática">
+                </div>
+                <div class="card-content">
+                    <h2>Relación Matemática y Teorema de Euler</h2>
+                    <p>Existe una relación fundamental entre propiedades intensivas y extensivas expresada por el <strong>Teorema de Euler para funciones homogéneas</strong>. Este teorema es la base de la termodinámica de superficies y sistemas multicomponente.</p>
+
+                    <p>Para la energía interna U(S,V,n):<br>
+                    U = TS - PV + Σ μᵢnᵢ</p>
+
+                    <p>Esta ecuación muestra cómo una propiedad extensiva (U) se expresa como combinación de propiedades intensivas (T, P, μ) multiplicadas por sus conjugadas extensivas (S, V, n).</p>
+
+                    <div class="tech-box">
+                        <h3>🧮 Detalle Técnico</h3>
+                        <p>Ecuación de Gibbs-Duhem:<br>
+                        SdT - VdP + Σ nᵢdμᵢ = 0<br><br>
+                        Esta relación demuestra que las propiedades intensivas no son independientes: si cambiamos T y P, los potenciales químicos μᵢ deben ajustarse necesariamente.</p>
+                    </div>
+
+                    <div class="nature-comparison">
+                        <h4>🔥 Fenómeno Natural: Combustión Forestal</h4>
+                        <p>En un incendio forestal, la <strong>energía total liberada</strong> (extensiva) depende del área quemada, pero la <strong>temperatura de llama</strong> (intensiva, ~800-1200°C) es similar sin importar si arden 1 hectárea o 10,000. Sin embargo, el calor radiante (que depende del área) sí escala con el tamaño del fuego.</p>
+                    </div>
+
+                    <div class="curiosity">
+                        <strong>💡 Curiosidad</strong>
+                        <p>La ecuación de Gibbs-Duhem explica por qué no puedes cambiar independientemente la temperatura, presión y composición de una mezcla: están matemáticamente vinculadas, como las cuerdas de una marioneta.</p>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+
+        <!-- SECCIÓN DE REFLEXIÓN -->
+        <section class="reflection-section">
+            <h2>Reflexión Final</h2>
+            <p>"La termodinámica nos enseña que la naturaleza opera en dos escalas simultáneas: la cantidad total de energía y materia que poseemos (extensiva) y la calidad o intensidad de esa energía (intensiva). Mientras que podemos acumular grandes cantidades de recursos, su utilidad real depende de su concentración y potencial. Así como un océano inmenso de agua tibia tiene menos utilidad energética que un pequeño volumen de vapor a alta presión, en la vida no siempre más es mejor; lo crucial es entender la <span class="highlight">densidad de valor</span> de lo que poseemos."</p>
+        </section>
+
+        <!-- ZONA DE PREGUNTAS IA -->
+        <section class="questions-section">
+            <div class="questions-header">
+                <h2>Zona de Análisis con IA</h2>
+                <p>Responde la pregunta de análisis y recibe retroalimentación inteligente</p>
+            </div>
+
+            <!-- Banco de preguntas (10 preguntas disponibles) -->
+            <div class="question-bank">
+                <div class="question-item">
+                    <h3>1. ¿Cuál es la diferencia fundamental entre propiedades intensivas y extensivas?</h3>
+                    <p>Las intensivas no dependen de la cantidad de materia (T, P), mientras que las extensivas sí (V, U, m).</p>
+                </div>
+                <div class="question-item">
+                    <h3>2. ¿Por qué la densidad es intensiva si se calcula con masa y volumen (ambas extensivas)?</h3>
+                    <p>Porque al dividir dos propiedades extensivas, la dependencia de la masa se cancela, resultando en una propiedad intensiva.</p>
+                </div>
+                <div class="question-item">
+                    <h3>3. ¿Qué sucede con las propiedades extensivas si dividimos un sistema en dos partes iguales?</h3>
+                    <p>Cada propiedad extensiva se reduce a la mitad en cada parte, mientras que las intensivas permanecen iguales.</p>
+                </div>
+                <div class="question-item">
+                    <h3>4. ¿Cómo se relaciona el teorema de Euler con las propiedades termodinámicas?</h3>
+                    <p>Permite expresar propiedades extensivas como suma de productos de intensivas por sus conjugadas extensivas.</p>
+                </div>
+                <div class="question-item">
+                    <h3>5. ¿Por qué es importante distinguir estas propiedades en el diseño de procesos?</h3>
+                    <p>Para escalar correctamente de laboratorio a planta industrial manteniendo las condiciones intensivas constantes.</p>
+                </div>
+                <div class="question-item">
+                    <h3>6. ¿Qué es una propiedad específica?</h3>
+                    <p>Es una propiedad extensiva dividida por la masa, convirtiéndola en intensiva (ej: volumen específico v = V/m).</p>
+                </div>
+                <div class="question-item">
+                    <h3>7. ¿La energía cinética de un sistema es intensiva o extensiva?</h3>
+                    <p>Es extensiva, ya que depende de la masa total del sistema (Ec = ½mv²).</p>
+                </div>
+                <div class="question-item">
+                    <h3>8. ¿Cómo afecta la altitud a las propiedades del agua?</h3>
+                    <p>Cambia propiedades intensivas como el punto de ebullición (por la presión), pero no las extensivas como el volumen específico del líquido.</p>
+                </div>
+                <div class="question-item">
+                    <h3>9. ¿Qué establece la ecuación de Gibbs-Duhem?</h3>
+                    <p>Que las propiedades intensivas de un sistema no son independientes entre sí; están relacionadas matemáticamente.</p>
+                </div>
+                <div class="question-item">
+                    <h3>10. ¿Por qué el potencial químico es una propiedad intensiva?</h3>
+                    <p>Porque representa la energía por mol añadida al sistema, independiente de la cantidad total de sustancia presente.</p>
+                </div>
+            </div>
+
+            <!-- Pregunta activa con área de texto -->
+            <div class="active-question">
+                <h3>🎯 Pregunta de Análisis Profundo</h3>
+                <div class="question-text">
+                    <strong>Situación:</strong> Imagina que tienes dos recipientes idénticos con agua a 25°C y 1 atm. En el recipiente A hay 1 kg de agua, en el B hay 5 kg. Ambos se calientan hasta 75°C.<br><br>
+                    <strong>Pregunta:</strong> Explica detalladamente:<br>
+                    a) ¿Qué propiedades intensivas cambiaron y cuáles permanecieron iguales entre ambos recipientes?<br>
+                    b) ¿Qué propiedades extensivas son diferentes entre A y B?<br>
+                    c) Si mezclas ambos recipientes, ¿cuál será la temperatura final y por qué?
+                </div>
+                
+                <textarea id="answerTextarea1" placeholder="Escribe tu respuesta aquí... Analiza cuidadosamente cada aspecto de la pregunta considerando la definición de propiedades intensivas y extensivas."></textarea>
+                
+                <button class="btn" onclick="showFeedback()">
+                    <span>🤖</span> Mostrar Retroalimentación Modelo
+                </button>
+
+                <div id="feedbackBox" class="feedback-box">
+                    <h4>✅ Retroalimentación de la IA:</h4>
+                    <p><strong>a) Propiedades intensivas:</strong> La temperatura cambió en ambos (de 25°C a 75°C), pero es la misma en A y B en cada instante. La presión se mantuvo constante (1 atm) en ambos. La densidad disminuyó ligeramente en ambos por la expansión térmica, pero es idéntica en A y B a la misma temperatura.</p>
+                    
+                    <p><strong>b) Propiedades extensivas:</strong> La masa es diferente (1 kg vs 5 kg). El volumen es 5 veces mayor en B. La energía interna total es 5 veces mayor en B (U = m·u, donde u es la energía específica). El calor necesario para el calentamiento es 5 veces mayor en B (Q = m·c·ΔT).</p>
+                    
+                    <p><strong>c) Temperatura final:</strong> Al mezclarlos, la temperatura final será 75°C. Como ambos están a la misma temperatura (propiedad intensiva), no hay flujo de calor entre ellos al mezclarse. La temperatura es intensiva, por lo que no se "promedia" ni se suma; simplemente permanece igual. Lo que sí se suma es la masa total (6 kg) y la energía interna total.</p>
+                    
+                    <p><em>💡 Consejo: Recuerda que las propiedades intensivas definen el estado termodinámico, mientras que las extensivas indican el "tamaño" del sistema.</em></p>
+                </div>
+            </div>
+
+            <!-- Textareas adicionales para activar el birrete (ocultos visualmente pero presentes) -->
+            <div style="display: grid; gap: 1rem; margin-top: 2rem;">
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--color-titles);">Reflexión adicional 1:</label>
+                    <textarea id="answerTextarea2" placeholder="Describe un ejemplo cotidiano donde observes propiedades intensivas y extensivas..."></textarea>
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--color-titles);">Reflexión adicional 2:</label>
+                    <textarea id="answerTextarea3" placeholder="¿Cómo aplicarías estos conceptos en tu área de estudio o trabajo?..."></textarea>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- BIRRETE FLOTANTE (GAMIFICACIÓN) -->
+    <div id="graduationCap" class="graduation-cap">
+        🎓
+        <div class="cap-text">¡Excelente trabajo!<br>Has completado el análisis</div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2026 - Desarrollado por [Tu Nombre] | Clase de Termodinámica</p>
+        <p style="margin-top: 0.5rem; font-size: 0.8rem; opacity: 0.7;">Propiedades Intensivas y Extensivas - Material Educativo</p>
+    </footer>
+
+    <script>
+        // Funcionalidad del birrete flotante
+        let textareasCompleted = 0;
+        const textareas = ['answerTextarea1', 'answerTextarea2', 'answerTextarea3'];
+        const graduationCap = document.getElementById('graduationCap');
+        let capShown = false;
+
+        // Escuchar cambios en los textareas
+        textareas.forEach(id => {
+            const textarea = document.getElementById(id);
+            if (textarea) {
+                textarea.addEventListener('input', function() {
+                    if (this.value.trim().length > 10 && !this.dataset.completed) {
+                        this.dataset.completed = 'true';
+                        textareasCompleted++;
+                        checkGraduationCap();
+                    }
+                });
+            }
+        });
+
+        function checkGraduationCap() {
+            if (textareasCompleted >= 3 && !capShown) {
+                capShown = true;
+                setTimeout(() => {
+                    graduationCap.classList.add('show');
+                }, 500);
+            }
+        }
+
+        // Función para mostrar retroalimentación
+        function showFeedback() {
+            const feedbackBox = document.getElementById('feedbackBox');
+            const textarea = document.getElementById('answerTextarea1');
+            
+            if (textarea.value.trim().length < 10) {
+                alert('Por favor, escribe tu respuesta antes de ver la retroalimentación.');
+                textarea.focus();
+                return;
+            }
+            
+            feedbackBox.classList.add('show');
+            feedbackBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Animación suave al cargar
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

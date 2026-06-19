@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulador Cinemático: Yugo Escocés</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      color: #f8fafc;
+    }
+    h1 { 
+      margin-bottom: 15px; 
+      font-size: 26px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+    
+    /* Contenedor principal translúcido con efecto Blur */
+    .contenedor {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      background: rgba(30, 41, 59, 0.7);
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      max-width: 1100px;
+      width: 100%;
+    }
+    
+    /* Área del gráfico SVG */
+    .area-grafica { flex: 1; min-width: 500px; }
+    svg { 
+      width: 100%; 
+      height: auto; 
+      border: 1px solid #334155; 
+      border-radius: 12px; 
+      background: #090d16; 
+    }
+
+    /* Panel de controles laterales */
+    .panel-controles {
+      width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #334155;
+    }
+    .control-group { display: flex; flex-direction: column; gap: 8px; }
+    label { font-size: 13px; font-weight: bold; color: #cbd5e1; display: flex; justify-content: space-between; }
+    label span { color: #38bdf8; font-family: monospace; font-size: 14px; }
+    input[type="range"] { width: 100%; cursor: pointer; accent-color: #38bdf8; }
+
+    /* Clases de Estilo Estructurales para el SVG (Yugo Escocés) */
+    .guias-soporte { fill: #475569; stroke: #64748b; stroke-width: 2; }
+    .manivela-disco { fill: #1e293b; stroke: #475569; stroke-width: 2; stroke-dasharray: 4,4; }
+    .manivela-brazo { stroke: #f43f5e; stroke-width: 8; stroke-linecap: round; } 
+    .perno-deslizante { fill: #ffffff; stroke: #f43f5e; stroke-width: 2; }
+    .yugo-ranura { stroke: #38bdf8; stroke-width: 12; stroke-linecap: square; }
+    .vástago-seguidor { stroke: #10b981; stroke-width: 8; stroke-linecap: round; }
+    .piston { fill: #10b981; stroke: #059669; stroke-width: 2; }
+    .perno-fijo { fill: #ffffff; stroke: #334155; stroke-width: 3; }
+  </style>
+</head>
+<body>
+
+  <h1>Simulador Cinemático: Yugo Escocés</h1>
+
+  <div class="contenedor">
+    
+    <div class="area-grafica">
+      <svg viewBox="0 0 800 500">
+        <line id="eje-horizontal" x1="50" y1="250" x2="750" y2="250" stroke="#334155" stroke-width="1" stroke-dasharray="8,4" />
+        <line id="eje-vertical" x1="250" y1="50" x2="250" y2="450" stroke="#334155" stroke-width="1" stroke-dasharray="8,4" />
+        
+        <rect id="guia-superior" x="450" y="190" width="120" height="15" rx="2" class="guias-soporte" />
+        <rect id="guia-inferior" x="450" y="295" width="120" height="15" rx="2" class="guias-soporte" />
+        
+        <circle id="disco-trayectoria" cx="250" cy="250" r="80" class="manivela-disco" />
+
+        <circle cx="250" cy="250" r="10" fill="#334155" stroke="#64748b" stroke-width="1.5" />
+
+        <g id="grupo-manivela">
+          <line id="linea-manivela" x1="250" y1="250" x2="330" y2="250" class="manivela-brazo" />
+          <circle id="perno-manivela" cx="330" cy="250" r="7" class="perno-fijo" />
+        </g>
+        
+        <g id="grupo-yugo">
+          <line id="ranura-yugo" x1="330" y1="130" x2="330" y2="370" class="yugo-ranura" />
+          <circle id="perno-bloque" cx="330" cy="250" r="11" class="perno-deslizante" />
+          <line id="linea-vastago" x1="330" y1="250" x2="550" y2="250" class="vástago-seguidor" />
+          <rect id="bloque-piston" x="550" y="210" width="70" height="80" rx="6" class="piston" />
+          <circle id="perno-piston" cx="585" cy="250" r="5" class="perno-fijo" />
+        </g>
+
+        <g id="panel-variables" transform="translate(20, 20)">
+          <rect x="0" y="0" width="240" height="140" rx="8" fill="#1e293b" opacity="0.9" stroke="#334155" stroke-width="2" />
+          <text x="15" y="25" fill="#f8fafc" font-family="monospace" font-size="13" font-weight="bold" letter-spacing="1">TELEMETRÍA DINÁMICA</text>
+          <line x1="15" y1="32" x2="225" y2="32" stroke="#334155" stroke-width="1.5" />
+          
+          <text x="15" y="60" fill="#34d399" font-family="monospace" font-size="14" font-weight="bold">Ángulo Ent.:  <tspan id="txt-angulo">0</tspan>°</text>
+          <text x="15" y="85" fill="#38bdf8" font-family="monospace" font-size="14" font-weight="bold">Posición (x): <tspan id="txt-posicion">0.0</tspan> mm</text>
+          <text x="15" y="110" fill="#fbbf24" font-family="monospace" font-size="14" font-weight="bold">Fuerza Teo.:  <tspan id="txt-fuerza">0.0</tspan> N</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="panel-controles">
+      <h3 style="margin-top:0; color:#f8fafc; font-size:16px; border-bottom:2px solid #38bdf8; padding-bottom:5px;">Configuración</h3>
+      
+      <div class="control-group">
+        <label>Radio Manivela (r): <span id="val-r">80</span> px</label>
+        <input type="range" id="sl-r" min="30" max="110" value="80" step="1">
+      </div>
+
+      <div class="control-group">
+        <label>Largo Vástago (L): <span id="val-l">220</span> px</label>
+        <input type="range" id="sl-l" min="150" max="300" value="220" step="1">
+      </div>
+
+      <div class="control-group">
+        <label>Alto Ranura (H): <span id="val-h">240</span> px</label>
+        <input type="range" id="sl-h" min="150" max="300" value="240" step="1">
+      </div>
+
+      <div class="control-group">
+        <label>Velocidad de Giro: <span id="val-rpm">1</span></label>
+        <input type="range" id="sl-rpm" min="0" max="5" value="1" step="0.2">
+      </div>
+
+      <div class="control-group" style="margin-top: 5px;">
+        <button id="btn-play-pause" style="width: 100%; padding: 12px; background-color: #ef4444; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer; transition: background 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+          Pausar Animación
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Referencias a nodos gráficos SVG
+    const discoTrayectoria = document.getElementById('disco-trayectoria');
+    const lineaManivela = document.getElementById('linea-manivela');
+    const pernoManivela = document.getElementById('perno-manivela');
+    
+    const ranuraYugo = document.getElementById('ranura-yugo');
+    const pernoBloque = document.getElementById('perno-bloque');
+    const lineaVastago = document.getElementById('linea-vastago');
+    const bloquePiston = document.getElementById('bloque-piston');
+    const pernoPiston = document.getElementById('perno-piston');
+    
+    const guiaSuperior = document.getElementById('guia-superior');
+    const guiaInferior = document.getElementById('guia-inferior');
+
+    // Deslizadores de control de usuario
+    const slR = document.getElementById('sl-r');
+    const slL = document.getElementById('sl-l');
+    const slH = document.getElementById('sl-h');
+    const slRpm = document.getElementById('sl-rpm');
+    const btnPlayPause = document.getElementById('btn-play-pause');
+
+    // Visores textuales de configuración e instrumentación
+    const valR = document.getElementById('val-r');
+    const valL = document.getElementById('val-l');
+    const valH = document.getElementById('val-h');
+    const valRpm = document.getElementById('val-rpm');
+    
+    const txtAngulo = document.getElementById('txt-angulo');
+    const txtPosicion = document.getElementById('txt-posicion');
+    const txtFuerza = document.getElementById('txt-fuerza');
+
+    // Coordenadas fijas del pivote del cigüeñal (Centro motriz)
+    const x0 = 250;  
+    const y0 = 250;  
+    
+    let angulo = 0;  
+    let ejecutando = true; // Flag lógico de animación
+
+    function actualizarMecanismo() {
+      if (!ejecutando) return;
+
+      // 1. Lectura paramétrica dinámica desde la interfaz
+      let r = parseFloat(slR.value);
+      let l = parseFloat(slL.value);
+      let h = parseFloat(slH.value);
+      let velocidad = parseFloat(slRpm.value);
+
+      // Despliegue de valores en el panel lateral
+      valR.textContent = r;
+      valL.textContent = l;
+      valH.textContent = h;
+      valRpm.textContent = velocidad === 0 ? "PAUSA" : velocidad;
+
+      // CANDADO DE SEGURIDAD MECÁNICA: La altura de la ranura debe contener holgadamente el diámetro de manivela
+      if (h <= (r * 2) + 20) {
+        h = (r * 2) + 20;
+        slH.value = h;
+        valH.textContent = h;
+      }
+
+      // 2. Integración del avance angular
+      angulo = (angulo + velocidad) % 360;
+      let radianes = angulo * (Math.PI / 180);
+
+      // 3. MODELO CINEMÁTICO PURO (Yugo Escocés: Movimiento Armónico Simple)
+      // Posición del perno deslizante de la manivela (Punto B articulado)
+      let bx = x0 + r * Math.cos(radianes);
+      let by = y0 + r * Math.sin(radianes); // Coordenada Y que recorre la ranura
+      
+      // La coordenada X del yugo se acopla rígidamente solo a la componente X de la manivela (bx)
+      let posicionYugoX = bx; 
+      
+      // Extremo final del vástago seguidor
+      let posicionPistonX = posicionYugoX + l;
+
+      // 4. ACTUALIZACIÓN VECTORIAL EN TIEMPO REAL (SIN TRANSFORM ROTATE)
+      // Trayectoria de guía visual del disco
+      discoTrayectoria.setAttribute('r', r);
+
+      // Brazo de la manivela
+      lineaManivela.setAttribute('x1', x0);
+      lineaManivela.setAttribute('y1', y0);
+      lineaManivela.setAttribute('x2', bx);
+      lineaManivela.setAttribute('y2', by);
+      pernoManivela.setAttribute('cx', bx);
+      pernoManivela.setAttribute('cy', by);
+
+      // Conjunto rígido del Yugo (Mapeo síncrono absoluto)
+      // Ranura Vertical (se mueve horizontalmente con posicionYugoX, centrada en y0)
+      ranuraYugo.setAttribute('x1', posicionYugoX);
+      ranuraYugo.setAttribute('y1', y0 - h / 2);
+      ranuraYugo.setAttribute('x2', posicionYugoX);
+      ranuraYugo.setAttribute('y2', y0 + h / 2);
+
+      // Perno móvil acoplado (Comparte bx y by exactamente)
+      pernoBloque.setAttribute('cx', bx);
+      pernoBloque.setAttribute('cy', by);
+
+      // Vástago horizontal del seguidor
+      lineaVastago.setAttribute('x1', posicionYugoX);
+      lineaVastago.setAttribute('y1', y0);
+      lineaVastago.setAttribute('x2', posicionPistonX);
+      lineaVastago.setAttribute('y2', y0);
+
+      // Masa terminal / Pistón (Dimensiones fijas: 70x80)
+      bloquePiston.setAttribute('x', posicionPistonX);
+      pernoPiston.setAttribute('cx', posicionPistonX + 35);
+
+      // 5. REDIMENSIONAMIENTO ADAPTATIVO DE LAS GUÍAS DEL BLOQUE
+      // Las guías se posicionan fijas para centrar la carrera máxima y mínima del pistón
+      let xMinCarrera = x0 - r + l;
+      let xMaxCarrera = x0 + r + l;
+      let centroCarrera = (xMinCarrera + xMaxCarrera) / 2;
+      
+      // Ajustar posición horizontal de las camisas/guías de soporte fijos
+      guiaSuperior.setAttribute('x', centroCarrera - 30);
+      guiaInferior.setAttribute('x', centroCarrera - 30);
+
+      // 6. CÁLCULO Y DESPLIEGUE DE VARIABLES DE TELEMETRÍA
+      // Desplazamiento lineal neto partiendo desde el punto muerto izquierdo (0 mm)
+      let posicionEnMm = (posicionYugoX - (x0 - r));
+      
+      // Simulación termodinámica/física simplificada (Fuerza senoidal pura debido a la cinemática armónica)
+      let fuerzaSimulada = velocidad === 0 ? 0 : Math.abs(250 * Math.sin(radianes)) + 30;
+
+      txtAngulo.textContent = Math.floor(angulo);
+      txtPosicion.textContent = posicionEnMm.toFixed(1);
+      txtFuerza.textContent = velocidad === 0 ? "0.0" : fuerzaSimulada.toFixed(1);
+
+      // Llamada recursiva al gestor de refresco de pantalla nativo
+      requestAnimationFrame(actualizarMecanismo);
+    }
+
+    // Manejador del evento de interrupción de marcha/parada
+    btnPlayPause.addEventListener('click', () => {
+      ejecutando = !ejecutando;
+
+      if (ejecutando) {
+        btnPlayPause.textContent = "Pausar Animación";
+        btnPlayPause.style.backgroundColor = "#ef4444";
+        actualizarMecanismo();
+      } else {
+        btnPlayPause.textContent = "Iniciar Animación";
+        btnPlayPause.style.backgroundColor = "#10b981";
+      }
+    });
+
+    // Encendido inicial automático del lazo de control cinemático
+    actualizarMecanismo();
+  </script>
+</body>
+</html>

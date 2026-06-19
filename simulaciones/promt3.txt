@@ -1,0 +1,21 @@
+﻿Actúa como un Ingeniero Mecánico experto en Didáctica y Desarrollador Frontend Senior. Requiero que generes el código completo y unificado de un simulador cinemático interactivo en un solo archivo ".html" basado en web para el mecanismo: "Mecanismo de Cuatro Barras en Configuración de Doble Manivela (Drag-Link)".
+
+El diseño debe cumplir estrictamente con los siguientes requisitos estructurales, matemáticos y estéticos:
+
+1. ARQUITECTURA DE LA INTERFAZ (HTML/CSS):
+- Interfaz inspirada en un plano técnico tradicional (Estilo Blueprint). Fondo general azul oscuro (#0b3c5d) superpuesto con una cuadrícula fina de ingeniería.
+- El panel de controles debe ubicarse estrictamente en el lateral IZQUIERDO de la pantalla con un diseño compacto y minimalista (#002c4b), dejando el lienzo gráfico en el flanco derecho para una lectura limpia de las trayectorias.
+- Los deslizadores deben modificar las variables de los eslabones en tiempo real y mostrar sus valores numéricos instantáneos en color blanco tiza (#ffffff).
+- El botón de "Pausar / Iniciar Animación" debe ubicarse en la esquina superior izquierda del panel de control, cambiando su estado visual entre gris acero y azul cian metálico.
+
+2. ÁREA GRÁFICA (SVG):
+- Lienzo SVG con 'viewBox' extendido y fondo interno azul prusia (#001b30). Incluye una red de líneas tenues de fondo simulando coordenadas cartesianas.
+- Los eslabones se dibujarán imitando líneas de dibujo técnico: Manivela de entrada en cian brillante (#38bdf8), acoplador en blanco puro (#ffffff), y la manivela de salida en oro técnico (#eab308). Los pernos deben llevar una cruceta interna de centrado.
+- Integra un "Panel de Telemetría Dinámica" interno en el SVG (un <rect> translúcido azulado). Este cuadro debe desplegar con fuentes monoespaciadas el ángulo del motor de entrada, el ángulo de salida del seguidor y la relación instantánea de velocidades angulares (w4/w2).
+
+3. SCRIPT CINEMÁTICO (JAVASCRIPT):
+- Desarrollar un lazo de animación continuo basado en 'requestAnimationFrame' controlado por una variable booleana de ejecución.
+- ¡CRÍTICO PARA LA RIGIDEZ MECÁNICA!: No utilices transformaciones de rotación gráficas independientes ('transform="rotate(...)"'). Calcula trigonométricamente las coordenadas absolutas (X, Y) de cada nodo en cada cuadro basándote en el avance del ángulo motor. Redibuja de forma síncrona los atributos geométricos ('x1', 'y1', 'x2', 'y2', 'cx', 'cy') utilizando estrictamente las mismas variables calculadas en memoria para garantizar que el mecanismo nunca se desarme.
+- Aplica candados matemáticos en los deslizadores basados en el Teorema de Grashof para asegurar que ambos eslabones mantengan la condición de doble rotación completa de 360°.
+
+Entrégame únicamente el código completo, limpio y estructurado dentro de un solo bloque de código unificado, listo para guardar como archivo .html y ejecutar directamente en el navegador.

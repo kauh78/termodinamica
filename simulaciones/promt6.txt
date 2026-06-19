@@ -1,0 +1,21 @@
+﻿Actúa como un Ingeniero Mecánico experto en Didáctica y Desarrollador Frontend Senior. Requiero que generes el código completo y unificado de un simulador cinemático interactivo en un solo archivo ".html" basado en web para el mecanismo: "Mecanismo de Elevación de Tijera o Pantógrafo Simétrico de Dos Etapas Actuado por Corredera Horizontal".
+
+El diseño debe cumplir estrictamente con los siguientes requisitos estructurales, matemáticos y estéticos:
+
+1. ARQUITECTURA DE LA INTERFAZ (HTML/CSS):
+- Diseño de pantalla completa vanguardista (Estilo Cleanroom Aeroespacial). El lienzo SVG ocupa el 100% del fondo de la pantalla.
+- El panel de controles debe ser una tarjeta flotante y compacta superpuesta elegantemente en la esquina superior DERECHA de la interfaz, utilizando un fondo ultra-translúcido (background: rgba(15, 23, 42, 0.4)) con un potente 'backdrop-filter: blur(20px)' y esquinas redondeadas.
+- Los deslizadores deben modificar las longitudes de los brazos del pantógrafo y la posición del actuador horizontal en tiempo real. Cada control debe mostrar su valor numérico en un elemento <span> con color cian cristalino (#22d3ee).
+- Incluye un botón plano minimalista de "Pausar / Iniciar Animación" integrado al fondo de la tarjeta flotante que alterne su color de fondo entre gris suave translúcido y cian oscuro mediante transiciones CSS.
+
+2. ÁREA GRÁFICA (SVG):
+- Usa un lienzo SVG que responda dinámicamente a la pantalla completa y un fondo interno oscuro espacial (#020617).
+- Todos los brazos cruzados y articulaciones del pantógrafo deben definirse con clases CSS limpias, usando colores de alta visibilidad: Brazos de la etapa inferior en cian (#22d3ee), brazos de la etapa superior en azul eléctrico (#3b82f6), pernos de unión en blanco ártico (#f8fafc), y la plataforma superior móvil en verde esmeralda (#10b981).
+- Integra un "Panel de Telemetría Dinámica" interno en el SVG (un <rect> oscuro con opacidad 0.8) ubicado en la esquina superior izquierda. Este cuadro debe mostrar etiquetas claras y valores dinámicos para desplegar variables como desplazamiento del actuador horizontal, altura neta alcanzada por la plataforma en mm y el factor de amplificación de desplazamiento mecánico.
+
+3. SCRIPT CINEMÁTICO (JAVASCRIPT):
+- Desarrollar un lazo de animación continuo basado en 'requestAnimationFrame' controlado por una variable de ejecución.
+- ¡CRÍTICO PARA LA RIGIDEZ MECÁNICA!: No utilices transformaciones de rotación gráficas independientes ('transform="rotate(...)"'). En su lugar, calcula analíticamente mediante trigonometría de triángulos simétricos las coordenadas absolutas (X, Y) de los 9 pernos interconectados en cada cuadro basándote en el avance del actuador. Redibuja de forma síncrona los atributos geométricos de las líneas y rectángulos utilizando estrictamente las mismas variables calculadas en memoria.
+- Aplica candados lógicos en los deslizadores para evitar que el ángulo de apertura de las tijeras colapse a cero o supere los 80 grados, previniendo singularidades matemáticas.
+
+Entrégame únicamente el código completo, limpio y estructurado dentro de un solo bloque de código unificado, listo para guardar como archivo .html y ejecutar directamente en el navegador.

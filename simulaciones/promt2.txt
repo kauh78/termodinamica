@@ -1,0 +1,21 @@
+﻿Actúa como un Ingeniero Mecánico experto en Didáctica y Desarrollador Frontend Senior. Requiero que generes el código completo y unificado de un simulador cinemático interactivo en un solo archivo ".html" basado en web para el mecanismo: "Mecanismo de Retorno Rápido de Whitworth".
+
+El diseño debe cumplir estrictamente con los siguientes requisitos estructurales, matemáticos y estéticos:
+
+1. ARQUITECTURA DE LA INTERFAZ (HTML/CSS):
+- Diseño responsivo con una orientación vertical de pantalla. El panel de controles debe ubicarse en la sección SUPERIOR con un fondo sólido oscuro (#0f172a) y bordes neón magenta (#f43f5e). El lienzo gráfico se posicionará abajo.
+- Los deslizadores (inputs tipo range) deben modificar las variables geométricas clave en tiempo real. Cada control debe mostrar su valor numérico instantáneo en un elemento <span> con color Amarillo Eléctrico (#facc15).
+- Incluye el botón "Pausar / Iniciar Animación" centrado justo en medio de los deslizadores superiores, usando transiciones suaves de color púrpura (#a855f7) a verde neón.
+
+2. ÁREA GRÁFICA (SVG):
+- Usa un lienzo SVG con un 'viewBox' adecuado (0 0 800 600) y un fondo interno negro profundo (#020617) de alta saturación para simular una pantalla OLED de diagnóstico nocturno.
+- Todos los eslabones y correderas deben definirse con clases CSS, usando colores fluorescentes: Manivela motriz en magenta (#f43f5e), brazo oscilante conducido en violeta (#a855f7), y la herramienta/ariete superior en cian eléctrico (#06b6d4).
+- Integra un "Panel de Telemetría Dinámica" interno en el SVG (<rect> con opacidad 0.95). Este cuadro debe mostrar etiquetas y valores de texto dinámicos (<tspan>) con tipografía monoespaciada para desplegar variables como ángulo del motor, velocidad lineal de corte en mm/s y la ventaja mecánica instantánea.
+
+3. SCRIPT CINEMÁTICO (JAVASCRIPT):
+- Desarrollar un lazo de animación continuo basado en 'requestAnimationFrame' controlado por una variable booleana de ejecución vinculada al botón.
+- ¡CRÍTICO PARA LA RIGIDEZ MECÁNICA!: No utilices transformaciones de rotación gráficas independientes ('transform="rotate(...)"'). Calcula trigonométricamente las coordenadas absolutas (X, Y) de cada pasador, nodo y colisa en cada cuadro basándote en el avance del ángulo motor. Redibuja de forma síncrona los atributos geométricos ('x1', 'y1', 'x2', 'y2', 'cx', 'cy') de las líneas y círculos utilizando estrictamente las mismas variables calculadas en memoria.
+- Aplica candados lógicos en los deslizadores para evitar indeterminaciones físicas (ej. que la distancia entre centros sea mayor que la longitud de la manivela).
+- Las paredes o guías del ariete deben ser adaptativas: calcula analíticamente sus dimensiones de forma que cambien su longitud en tiempo real para ajustarse exactamente a la carrera extrema con una holgura fija.
+
+Entrégame únicamente el código completo, limpio y estructurado dentro de un solo bloque de código unificado, listo para guardar como archivo .html y ejecutar directamente en el navegador.

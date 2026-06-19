@@ -1,0 +1,342 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulador Cinemático: Elevación de Tijera Aeroespacial</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: black;
+      color: #f8fafc;
+    }
+
+    /* Contenedor flexible para asegurar centrado horizontal del SVG */
+    #canvas-container {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    svg {
+      width: 100vw;
+      height: 100vh;
+      background: #020617;
+    }
+
+    /* Tarjeta flotante translúcida de control superior derecha */
+    .panel-flotante {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 10;
+      width: 320px;
+      background: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    h3 {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #94a3b8;
+      margin-bottom: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 8px;
+    }
+
+    .control-group {
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #cbd5e1;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    label span {
+      color: #22d3ee;
+      font-family: monospace;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      cursor: pointer;
+      accent-color: #22d3ee;
+      background: rgba(255, 255, 255, 0.1);
+      height: 4px;
+      border-radius: 2px;
+      appearance: none;
+    }
+
+    /* Botón operativo dinámico */
+    .btn-control {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background: rgba(255, 255, 255, 0.08);
+      color: #f8fafc;
+    }
+
+    .btn-control.pausado {
+      background: rgba(8, 145, 178, 0.3);
+      border-color: rgba(34, 211, 238, 0.4);
+      color: #22d3ee;
+      box-shadow: 0 0 15px rgba(34, 211, 238, 0.2);
+    }
+
+    /* Estilos de Componentes Mecánicos */
+    .bancada-fija { fill: #1e293b; stroke: #475569; stroke-width: 2; }
+    .eslabon-inf { stroke: #22d3ee; stroke-width: 6; stroke-linecap: round; }
+    .eslabon-sup { stroke: #3b82f6; stroke-width: 6; stroke-linecap: round; }
+    .plataforma { fill: rgba(16, 185, 129, 0.12); stroke: #10b981; stroke-width: 4; stroke-linejoin: round; }
+    .perno { fill: #f8fafc; stroke: #0f172a; stroke-width: 2; }
+    .actuador-lineal { stroke: #475569; stroke-width: 3; stroke-dasharray: 6,4; }
+    .bloque-deslizante { fill: #475569; stroke: #94a3b8; stroke-width: 1.5; rx: 3; }
+    .linea-eje { stroke: #1e293b; stroke-width: 1.5; stroke-dasharray: 8,4; }
+  </style>
+</head>
+<body>
+
+  <div id="canvas-container">
+    <svg id="simulador-svg" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid meet">
+      
+      <line id="eje-inferior" x1="100" y1="700" x2="1100" y2="700" class="linea-eje" />
+      <line id="eje-superior" x1="100" y1="300" class="linea-eje" />
+      
+      <line id="linea-actuador" x1="450" y1="700" x2="750" y2="700" class="actuador-lineal" />
+      
+      <path id="bancada-soporte" d="M 430 700 L 470 700 L 450 675 Z" class="bancada-fija" />
+
+      <line id="link-a1" x1="450" y1="700" x2="750" y2="500" class="eslabon-inf" />
+      <line id="link-b1" x1="750" y1="700" x2="450" y2="500" class="eslabon-inf" />
+      
+      <line id="link-a2" x1="450" y1="500" x2="750" y2="300" class="eslabon-sup" />
+      <line id="link-b2" x1="750" y1="500" x2="450" y2="300" class="eslabon-sup" />
+
+      <rect id="slider-mecanico" x="730" y="688" width="40" height="24" class="bloque-deslizante" />
+
+      <polygon id="plataforma-superior" points="350,300 850,300 850,275 350,275" class="plataforma" />
+      <rect id="slider-superior" x="730" y="288" width="40" height="24" class="bloque-deslizante" />
+
+      <circle id="nodo-fijo" cx="450" cy="700" r="6" class="perno" />
+      <circle id="nodo-actuador" cx="750" cy="700" r="6" class="perno" />
+      <circle id="nodo-central-inf" cx="600" cy="500" r="6" class="perno" />
+      <circle id="nodo-izq-medio" cx="450" cy="500" r="6" class="perno" />
+      <circle id="nodo-der-medio" cx="750" cy="500" r="6" class="perno" />
+      <circle id="nodo-central-sup" cx="600" cy="300" r="6" class="perno" />
+      <circle id="nodo-plataforma-fijo" cx="450" cy="300" r="6" class="perno" />
+      <circle id="nodo-plataforma-desl" cx="750" cy="300" r="6" class="perno" />
+
+      <g id="telemetria" transform="translate(40, 40)">
+        <rect x="0" y="0" width="360" height="205" rx="12" fill="#0b1329" opacity="0.9" stroke="rgba(34, 211, 238, 0.3)" stroke-width="1.5" />
+        <text x="24" y="35" fill="#94a3b8" font-family="monospace" font-size="14" font-weight="bold" letter-spacing="1.5">SISTEMA DE TELEMETRÍA HMI</text>
+        <line x1="24" y1="48" x2="336" y2="48" stroke="rgba(255, 255, 255, 0.1)" stroke-width="1.5" />
+        
+        <text x="24" y="85" fill="#f8fafc" font-family="monospace" font-size="17">Apertura Eje (X): <tspan id="tel-actuador" fill="#22d3ee" font-weight="bold">0.0</tspan> mm</text>
+        <text x="24" y="125" fill="#f8fafc" font-family="monospace" font-size="17">Altura de Alzada: <tspan id="tel-altura" fill="#10b981" font-weight="bold">0.0</tspan> mm</text>
+        <text x="24" y="165" fill="#f8fafc" font-family="monospace" font-size="17">Ventaja Mecánica: <tspan id="tel-amplificacion" fill="#3b82f6" font-weight="bold">0.0</tspan> x</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="panel-flotante">
+    <h3>Configuración</h3>
+    
+    <div class="control-group">
+      <label>Longitud de Brazos: <span id="val-l">180</span> px</label>
+      <input type="range" id="sl-l" min="100" max="200" value="180" step="1">
+    </div>
+
+    <div class="control-group">
+      <label>Frecuencia de Oscilación: <span id="val-vel">0.8</span> Hz</label>
+      <input type="range" id="sl-vel" min="0" max="3" value="0.8" step="0.1">
+    </div>
+
+    <div class="control-group">
+      <label>Carrera de Trabajo: <span id="val-carrera">110</span> px</label>
+      <input type="range" id="sl-carrera" min="40" max="160" value="110" step="1">
+    </div>
+
+    <button id="btn-play-pause" class="btn-control">PAUSAR ANIMACIÓN</button>
+  </div>
+
+  <script>
+    const linkA1 = document.getElementById('link-a1');
+    const linkB1 = document.getElementById('link-b1');
+    const linkA2 = document.getElementById('link-a2');
+    const linkB2 = document.getElementById('link-b2');
+    
+    const sliderMecanico = document.getElementById('slider-mecanico');
+    const sliderSuperior = document.getElementById('slider-superior');
+    const plataformaSuperior = document.getElementById('plataforma-superior');
+    const lineaActuador = document.getElementById('linea-actuador');
+
+    const ejeSuperior = document.getElementById('eje-superior');
+
+    const nFijo = document.getElementById('nodo-fijo');
+    const nActuador = document.getElementById('nodo-actuador');
+    const nCentralInf = document.getElementById('nodo-central-inf');
+    const nIzqMedio = document.getElementById('nodo-izq-medio');
+    const nDerMedio = document.getElementById('nodo-der-medio');
+    const nCentralSup = document.getElementById('nodo-central-sup');
+    const nPlatFijo = document.getElementById('nodo-plataforma-fijo');
+    const nPlatDesl = document.getElementById('nodo-plataforma-desl');
+
+    const slL = document.getElementById('sl-l');
+    const slVel = document.getElementById('sl-vel');
+    const slCarrera = document.getElementById('sl-carrera');
+    const btnPlayPause = document.getElementById('btn-play-pause');
+
+    const valL = document.getElementById('val-l');
+    const valVel = document.getElementById('val-vel');
+    const valCarrera = document.getElementById('val-carrera');
+    
+    const telActuador = document.getElementById('tel-actuador');
+    const telAltura = document.getElementById('tel-altura');
+    const telAmplificacion = document.getElementById('tel-amplificacion');
+
+    const xBase = 450; 
+    const yBase = 700;
+
+    let tiempo = 0;
+    let ejecutando = true;
+
+    function resolverCinematica() {
+      if (!ejecutando) return;
+
+      let L = parseFloat(slL.value);
+      let f = parseFloat(slVel.value);
+      let carreraMax = parseFloat(slCarrera.value);
+
+      if (carreraMax > L * 0.9) {
+        carreraMax = Math.floor(L * 0.9);
+      }
+
+      valL.textContent = L;
+      valVel.textContent = f;
+      valCarrera.textContent = carreraMax;
+
+      tiempo += (f * 0.015);
+      
+      let oscilacion = (Math.sin(tiempo * Math.PI * 2) + 1) / 2; 
+      let desplazamientoActuador = (L * 0.5) + oscilacion * carreraMax;
+
+      let semidistancia = desplazamientoActuador / 2;
+      if (semidistancia >= L * Math.sin(78 * Math.PI / 180)) {
+        desplazamientoActuador = 2 * L * Math.sin(78 * Math.PI / 180) - 2;
+        semidistancia = desplazamientoActuador / 2;
+      }
+      if (semidistancia <= L * Math.sin(12 * Math.PI / 180)) {
+        desplazamientoActuador = 2 * L * Math.sin(12 * Math.PI / 180) + 2;
+        semidistancia = desplazamientoActuador / 2;
+      }
+
+      let alturaEtapa = Math.sqrt(L * L - semidistancia * semidistancia);
+      
+      let xIzquierda = xBase;
+      let xDerecha = xBase + desplazamientoActuador;
+      let xCentro = xBase + semidistancia;
+
+      let yNivelBase = yBase;
+      let yNivelInfCentral = yBase - alturaEtapa;
+      let yNivelMedio = yBase - 2 * alturaEtapa;
+      let yNivelSupCentral = yBase - 3 * alturaEtapa;
+      let yNivelPlataforma = yBase - 4 * alturaEtapa;
+
+      ejeSuperior.setAttribute('y1', yNivelPlataforma); 
+      ejeSuperior.setAttribute('y2', yNivelPlataforma);
+
+      lineaActuador.setAttribute('x1', xIzquierda);   lineaActuador.setAttribute('y1', yNivelBase);
+      lineaActuador.setAttribute('x2', xDerecha);     lineaActuador.setAttribute('y2', yNivelBase);
+
+      linkA1.setAttribute('x1', xIzquierda);  linkA1.setAttribute('y1', yNivelBase);
+      linkA1.setAttribute('x2', xDerecha);    linkA1.setAttribute('y2', yNivelMedio);
+
+      linkB1.setAttribute('x1', xDerecha);    linkB1.setAttribute('y1', yNivelBase);
+      linkB1.setAttribute('x2', xIzquierda);  linkB1.setAttribute('y2', yNivelMedio);
+
+      linkA2.setAttribute('x1', xIzquierda);  linkA2.setAttribute('y1', yNivelMedio);
+      linkA2.setAttribute('x2', xDerecha);    linkA2.setAttribute('y2', yNivelPlataforma);
+
+      linkB2.setAttribute('x1', xDerecha);    linkB2.setAttribute('y1', yNivelMedio);
+      linkB2.setAttribute('x2', xIzquierda);  linkB2.setAttribute('y2', yNivelPlataforma);
+
+      sliderMecanico.setAttribute('x', xDerecha - 20);
+      sliderMecanico.setAttribute('y', yNivelBase - 12);
+      
+      sliderSuperior.setAttribute('x', xDerecha - 20);
+      sliderSuperior.setAttribute('y', yNivelPlataforma - 12);
+
+      let anchoPlataforma = 550;
+      let xInicioPlat = xCentro - (anchoPlataforma / 2);
+      plataformaSuperior.setAttribute('points', `${xInicioPlat},${yNivelPlataforma} ${xInicioPlat + anchoPlataforma},${yNivelPlataforma} ${xInicioPlat + anchoPlataforma},${yNivelPlataforma - 20} ${xInicioPlat},${yNivelPlataforma - 20}`);
+
+      nFijo.setAttribute('cx', xIzquierda);         nFijo.setAttribute('cy', yNivelBase);
+      nActuador.setAttribute('cx', xDerecha);       nActuador.setAttribute('cy', yNivelBase);
+      nCentralInf.setAttribute('cx', xCentro);      nCentralInf.setAttribute('cy', yNivelInfCentral);
+      nIzqMedio.setAttribute('cx', xIzquierda);     nIzqMedio.setAttribute('cy', yNivelMedio);
+      nDerMedio.setAttribute('cx', xDerecha);       nDerMedio.setAttribute('cy', yNivelMedio);
+      nCentralSup.setAttribute('cx', xCentro);      nCentralSup.setAttribute('cy', yNivelSupCentral);
+      nPlatFijo.setAttribute('cx', xIzquierda);     nPlatFijo.setAttribute('cy', yNivelPlataforma);
+      nPlatDesl.setAttribute('cx', xDerecha);       nPlatDesl.setAttribute('cy', yNivelPlataforma);
+
+      let carreraTotalX = desplazamientoActuador;
+      let alzadaNeta = yNivelBase - yNivelPlataforma;
+      let ventajaMecanica = (alturaEtapa / Math.max(0.01, semidistancia));
+
+      telActuador.textContent = carreraTotalX.toFixed(1);
+      telAltura.textContent = alzadaNeta.toFixed(1);
+      telAmplificacion.textContent = Math.abs(ventajaMecanica).toFixed(2);
+
+      requestAnimationFrame(resolverCinematica);
+    }
+
+    btnPlayPause.addEventListener('click', () => {
+      ejecutando = !ejecutando;
+      if (ejecutando) {
+        btnPlayPause.textContent = "PAUSAR ANIMACIÓN";
+        btnPlayPause.classList.remove('pausado');
+        resolverCinematica();
+      } else {
+        btnPlayPause.textContent = "INICIAR ANIMACIÓN";
+        btnPlayPause.classList.add('pausado');
+      }
+    });
+
+    resolverCinematica();
+  </script>
+</body>
+</html>

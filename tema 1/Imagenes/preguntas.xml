@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+
+    <!-- Pregunta 1: Arrastrar (ddwtos) sobre unidades de calor específico -->
+    <question type="ddwtos">
+        <name>
+            <text>P1: Unidades de calor específico</text>
+        </name>
+        <questiontext format="html">
+            <text><![CDATA[
+                <p>La ecuación para el calor sensible es \( q = mc\Delta T \).</p>
+                <p>Si la masa \( m \) se mide en kilogramos (kg) y la variación de temperatura \( \Delta T \) en kelvin (K), las unidades del calor específico \( c \) deben ser [[1]] para que la energía \( q \) se obtenga en julios (J).</p>
+            ]]></text>
+        </questiontext>
+        <defaultgrade>1</defaultgrade>
+        <penalty>0.3333333</penalty>
+        <hidden>0</hidden>
+        <shuffleanswers>1</shuffleanswers>
+        <correctfeedback format="html">
+            <text><![CDATA[<p>¡Correcto! Las unidades son J/(kg·K).</p>]]></text>
+        </correctfeedback>
+        <partiallycorrectfeedback format="html">
+            <text><![CDATA[<p>Revisa las unidades base. Recuerda que 1 J = 1 kg·m²/s².</p>]]></text>
+        </partiallycorrectfeedback>
+        <incorrectfeedback format="html">
+            <text><![CDATA[<p>Las unidades correctas son J/(kg·K).</p>]]></text>
+        </incorrectfeedback>
+        <shownumcorrect/>
+        <dragbox>
+            <text>J/(kg·K)</text>
+            <group>1</group>
+        </dragbox>
+        <dragbox>
+            <text>J·kg/K</text>
+            <group>1</group>
+        </dragbox>
+        <dragbox>
+            <text>kg·K/J</text>
+            <group>1</group>
+        </dragbox>
+    </question>
+
+    <!-- Pregunta 2: Cloze (multichoice) sobre el valor de la constante R -->
+    <question type="cloze">
+        <name>
+            <text>P2: Valor de la constante universal de los gases</text>
+        </name>
+        <questiontext format="html">
+            <text><![CDATA[
+                <p>La constante universal de los gases ideales \( R \) es una constante fundamental en termodinámica.</p>
+                <p>Su valor en unidades del Sistema Internacional (SI) es aproximadamente {1:MULTICHOICE:=8.314~0.0821~4.186} J/(mol·K).</p>
+            ]]></text>
+        </questiontext>
+        <defaultgrade>1</defaultgrade>
+        <penalty>0.3333333</penalty>
+        <hidden>0</hidden>
+        <generalfeedback format="html">
+            <text><![CDATA[<p>El valor de R en el SI es 8.314 J/(mol·K).</p>]]></text>
+        </generalfeedback>
+    </question>
+
+    <!-- Pregunta 3: Arrastrar (ddwtos) sobre la primera ley -->
+    <question type="ddwtos">
+        <name>
+            <text>P3: Primera ley de la termodinámica</text>
+        </name>
+        <questiontext format="html">
+            <text><![CDATA[
+                <p>La primera ley de la termodinámica establece la conservación de la energía.</p>
+                <p>Para un sistema cerrado, se expresa como: \( \Delta U = [[1]] - [[2]] \), donde \( U \) es la energía interna, \( Q \) es el calor y \( W \) es el trabajo realizado por el sistema.</p>
+            ]]></text>
+        </questiontext>
+        <defaultgrade>1</defaultgrade>
+        <penalty>0.3333333</penalty>
+        <hidden>0</hidden>
+        <shuffleanswers>1</shuffleanswers>
+        <correctfeedback format="html">
+            <text><![CDATA[<p>¡Correcto! La fórmula es ΔU = Q - W.</p>]]></text>
+        </correctfeedback>
+        <partiallycorrectfeedback format="html">
+            <text><![CDATA[<p>Recuerda el convenio de signos: Q es positivo cuando el sistema <b>absorbe</b> calor y W es positivo cuando el sistema <b>realiza</b> trabajo.</p>]]></text>
+        </partiallycorrectfeedback>
+        <incorrectfeedback format="html">
+            <text><![CDATA[<p>La forma correcta es ΔU = Q - W.</p>]]></text>
+        </incorrectfeedback>
+        <shownumcorrect/>
+        <dragbox>
+            <text>Q</text>
+            <group>1</group>
+        </dragbox>
+        <dragbox>
+            <text>W</text>
+            <group>1</group>
+        </dragbox>
+        <dragbox>
+            <text>ΔU</text>
+            <group>1</group>
+        </dragbox>
+        <dragbox>
+            <text>H</text>
+            <group>1</group>
+        </dragbox>
+    </question>
+
+    <!-- Pregunta 4: Cloze (shortanswer) sobre unidades de presión -->
+    <question type="cloze">
+        <name>
+            <text>P4: Unidad de presión en el SI</text>
+        </name>
+        <questiontext format="html">
+            <text><![CDATA[
+                <p>En el Sistema Internacional (SI), la unidad de presión es el {1:SHORTANSWER:=Pascal} (Pa).</p>
+            ]]></text>
+        </questiontext>
+        <defaultgrade>1</defaultgrade>
+        <penalty>0.3333333</penalty>
+        <hidden>0</hidden>
+        <generalfeedback format="html">
+            <text><![CDATA[<p>La unidad de presión en el SI es el Pascal (Pa), que equivale a N/m².</p>]]></text>
+        </generalfeedback>
+    </question>
+
+    <!-- Pregunta 5: Arrastrar (ddwtos) sobre el concepto de entropía -->
+    <question type="ddwtos">
+        <name>
+            <text>P5: Unidades de entropía</text>
+        </name>
+        <questiontext format="html">
+            <text><![CDATA[
+                <p>La entropía es una función de estado que mide el grado de desorden de un sistema.</p>
+                <p>En el SI, la entropía \( S \) se mide en [[1]], que es equivalente a la energía (J) dividida por la temperatura (K).</p>
+            ]]></text>
+        </questiontext>
+        <defaultgrade>1</defaultgrade>
+        <penalty>0.3333333</penalty>
+        <hidden>0</hidden>
+        <shuffleanswers>1</shuffleanswers>
+        <correctfeedback format="html">
+            <text><![CDATA[<p>¡Correcto! La entropía se mide en J/K.</p>]]></text>
+        </correctfeedback>
+        <partiallycorrectfeedback format="html">
+            <text><![CDATA[<p>La fórmula de la entropía en un proceso reversible es ΔS = q_rev / T, por lo que sus unidades son J/K.</p>]]></text>
+        </partiallycorrectfeedback>
+        <incorrectfeedback format="html">
+            <text><![CDATA[<p>La unidad correcta es J/K.</p>]]></text>
+        </incorrectfeedback>
+        <shownumcorrect/>
+        <dragbox>
+            <text>J/K</text>
+            <group>1</group>
+        </dragbox>
+        <dragbox>
+            <text>J·K</text>
+            <group>1</group>
+        </dragbox>
+        <dragbox>
+            <text>K/J</text>
+            <group>1</group>
+        </dragbox>
+    </question>
+
+</quiz>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+/* Imagen clickeable - MÁS GRANDE */
+.imagen-clickeable {
+    cursor: pointer;
+    width: 100%;
+    max-width: 700px;  /* Imagen más grande */
+    border-radius: 15px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: block;
+    margin: 20px auto;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+.imagen-clickeable:hover {
+    transform: scale(1.03);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+}
+
+/* Fondo oscuro - ocupa toda la pantalla */
+.modal-fondo {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.92);
+    z-index: 9999;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+/* Ventana emergente - MUY GRANDE */
+.modal-ventana {
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    margin: 20px auto;
+    padding: 35px;
+    width: 92%;
+    max-width: 1100px;
+    border-radius: 25px;
+    color: white;
+    position: relative;
+    animation: aparecer 0.4s ease;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+}
+
+@keyframes aparecer {
+    from { opacity: 0; transform: scale(0.9) translateY(30px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Botón cerrar - más grande */
+.btn-cerrar {
+    position: sticky;
+    float: right;
+    font-size: 40px;
+    cursor: pointer;
+    color: white;
+    background: rgba(255,255,255,0.15);
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 48px;
+    transition: 0.3s;
+    border: none;
+    margin-top: -10px;
+    margin-right: -10px;
+}
+
+.btn-cerrar:hover {
+    background: #e74c3c;
+    transform: rotate(90deg) scale(1.1);
+}
+
+/* Contenido interno - con scroll */
+.mi-contenido {
+    background: white;
+    color: #333;
+    padding: 35px 40px;
+    border-radius: 20px;
+    margin-top: 20px;
+    max-height: 65vh;
+    overflow-y: auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.7;
+}
+
+.mi-contenido h1 {
+    color: #1e3c72;
+    font-size: 34px;
+    border-bottom: 4px solid #1e3c72;
+    padding-bottom: 15px;
+    margin-top: 0;
+}
+
+.mi-contenido h2 {
+    color: #2a5298;
+    font-size: 28px;
+    background: #e8f0fe;
+    padding: 12px 18px;
+    border-radius: 10px;
+}
+
+.mi-contenido h3 {
+    color: #c0392b;
+    font-size: 22px;
+}
+
+/* Lista de temperaturas en varias columnas */
+.lista-temperaturas {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    list-style: none;
+}
+
+.lista-temperaturas li {
+    background: #e9ecef;
+    padding: 6px 10px;
+    border-radius: 5px;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.lista-temperaturas li:hover {
+    background: #1e3c72;
+    color: white;
+}
+
+.equacion-destacada {
+    background: #2c3e50;
+    color: #ecf0f1;
+    padding: 15px 20px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 19px;
+    margin: 20px 0;
+}
+
+/* Scroll bonito */
+.mi-contenido::-webkit-scrollbar {
+    width: 10px;
+}
+.mi-contenido::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+.mi-contenido::-webkit-scrollbar-thumb {
+    background: #1e3c72;
+    border-radius: 10px;
+}
+</style>
+</head>
+<body>
+
+<!-- 👇 IMAGEN CLICKEABLE - REEMPLAZA URL_AQUI 👇 -->
+<img src="URL_AQUI" 
+     alt="Haz clic para ver la información"
+     class="imagen-clickeable"
+     onclick="abrirModal()">
+
+<!-- 👇 VENTANA EMERGENTE (MODAL) 👇 -->
+<div id="modalFondo" class="modal-fondo" onclick="cerrarModalFuera(event)">
+    <div class="modal-ventana">
+        <button class="btn-cerrar" onclick="cerrarModal()">✕</button>
+        
+        <div class="mi-contenido">
+            <h1>🌌 Más allá del Cero Absoluto</h1>
+            
+            <h2>🔄 Ciclos Termodinámicos</h2>
+            
+            <div class="equacion-destacada">
+                ⚡ CICLO DE CAMBIO (ideal) ⚡
+            </div>
+            
+            <h3>📊 Temperaturas del ciclo:</h3>
+            
+            <ul class="lista-temperaturas">
+                <script>
+                    for(let i = 1; i <= 100; i++) {
+                        document.write(`<li>T<sub>${i}</sub></li>`);
+                    }
+                </script>
+            </ul>
+            
+            <div class="equacion-destacada" style="background: #27ae60;">
+                📈 La termodinámica estudia la transformación de la energía
+            </div>
+            
+            <p style="text-align: center; color: #7f8c8d; margin-top: 20px;">
+                <strong>Sistemas abiertos, cerrados y aislados</strong> | Primera Ley | Entropía
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+function abrirModal() {
+    document.getElementById('modalFondo').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function cerrarModal() {
+    document.getElementById('modalFondo').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+function cerrarModalFuera(event) {
+    if (event.target === document.getElementById('modalFondo')) {
+        cerrarModal();
+    }
+}
+
+// Cerrar con tecla ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        cerrarModal();
+    }
+});
+</script>
+
+</body>
+</html>

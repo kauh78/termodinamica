@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulador Cinemático: Cuatro Barras (Grashof) Corregido</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      color: #f8fafc;
+    }
+    h1 { 
+      margin-bottom: 15px; 
+      font-size: 26px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+    
+    /* Contenedor principal translúcido con efecto Blur */
+    .contenedor {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      background: rgba(30, 41, 59, 0.7);
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      max-width: 1100px;
+      width: 100%;
+    }
+    
+    /* Área del gráfico SVG */
+    .area-grafica { flex: 1; min-width: 500px; }
+    svg { 
+      width: 100%; 
+      height: auto; 
+      border: 1px solid #334155; 
+      border-radius: 12px; 
+      background: #090d16; 
+    }
+
+    /* Panel de controles laterales */
+    .panel-controles {
+      width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #334155;
+    }
+    .control-group { display: flex; flex-direction: column; gap: 6px; }
+    label { font-size: 13px; font-weight: bold; color: #cbd5e1; display: flex; justify-content: space-between; }
+    label span { color: #38bdf8; font-family: monospace; font-size: 14px; }
+    input[type="range"] { width: 100%; cursor: pointer; accent-color: #38bdf8; }
+
+    /* Clases de Estilo Estructurales para el Mecanismo de 4 Barras */
+    .eslabon-fijo { stroke: #475569; stroke-width: 4; stroke-dasharray: 6,4; }
+    .bancada-soporte { fill: #1e293b; stroke: #475569; stroke-width: 2; }
+    .manivela { stroke: #f43f5e; stroke-width: 8; stroke-linecap: round; } 
+    .acoplador { stroke: #38bdf8; stroke-width: 6; stroke-linecap: round; }
+    .balancin { stroke: #10b981; stroke-width: 7; stroke-linecap: round; }
+    .perno-fijo { fill: #ffffff; stroke: #334155; stroke-width: 2.5; }
+    .perno-movil { fill: #ffffff; stroke: #475569; stroke-width: 1.5; }
+    .alerta-grashof {
+      font-size: 11px;
+      font-weight: bold;
+      color: #ef4444;
+      text-align: center;
+      background: rgba(239, 68, 68, 0.1);
+      padding: 6px;
+      border-radius: 6px;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Simulador Cinemático: Cuatro Barras (Grashof)</h1>
+
+  <div class="contenedor">
+    
+    <div class="area-grafica">
+      <svg viewBox="0 0 800 500">
+        <line x1="50" y1="320" x2="750" y2="320" stroke="#1e293b" stroke-width="1" stroke-dasharray="5,5" />
+        
+        <line id="linea-bancada" x1="250" y1="320" x2="450" y2="320" class="eslabon-fijo" />
+        <g id="soportes-fijos">
+          <circle id="bancada-o2" cx="250" cy="320" r="12" class="bancada-soporte" />
+          <circle id="bancada-o4" cx="450" cy="320" r="12" class="bancada-soporte" />
+        </g>
+
+        <line id="link-manivela" x1="250" y1="320" x2="250" y2="220" class="manivela" />
+        <line id="link-balancin" x1="450" y1="320" x2="450" y2="170" class="balancin" />
+        <line id="link-acoplador" x1="250" y1="220" x2="450" y2="170" class="acoplador" />
+
+        <circle id="pivote-o2" cx="250" cy="320" r="6" class="perno-fijo" />
+        <circle id="pivote-o4" cx="450" cy="320" r="6" class="perno-fijo" />
+        <circle id="pivote-a" cx="250" cy="220" r="5" class="perno-movil" />
+        <circle id="pivote-b" cx="450" cy="170" r="5" class="perno-movil" />
+
+        <g id="panel-variables" transform="translate(20, 20)">
+          <rect x="0" y="0" width="240" height="140" rx="8" fill="#1e293b" opacity="0.9" stroke="#334155" stroke-width="2" />
+          <text x="15" y="25" fill="#f8fafc" font-family="monospace" font-size="13" font-weight="bold" letter-spacing="1">TELEMETRÍA DINÁMICA</text>
+          <line x1="15" y1="32" x2="225" y2="32" stroke="#334155" stroke-width="1.5" />
+          
+          <text x="15" y="60" fill="#34d399" font-family="monospace" font-size="14" font-weight="bold">Ángulo θ2:   <tspan id="txt-angulo">0</tspan>°</text>
+          <text x="15" y="85" fill="#38bdf8" font-family="monospace" font-size="14" font-weight="bold">Ángulo θ4:   <tspan id="txt-trans">0.0</tspan>°</text>
+          <text x="15" y="110" fill="#fbbf24" font-family="monospace" font-size="14" font-weight="bold">Ángulo Trans: <tspan id="txt-fuerza">0.0</tspan>°</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="panel-controles">
+      <h3 style="margin-top:0; color:#f8fafc; font-size:16px; border-bottom:2px solid #38bdf8; padding-bottom:5px;">Configuración</h3>
+      
+      <div class="control-group">
+        <label>Bancada (d): <span id="val-d">200</span> px</label>
+        <input type="range" id="sl-d" min="120" max="280" value="200" step="1">
+      </div>
+
+      <div class="control-group">
+        <label>Manivela (a): <span id="val-a">60</span> px</label>
+        <input type="range" id="sl-a" min="30" max="110" value="60" step="1">
+      </div>
+
+      <div class="control-group">
+        <label>Acoplador (b): <span id="val-b">220</span> px</label>
+        <input type="range" id="sl-b" min="150" max="320" value="220" step="1">
+      </div>
+
+      <div class="control-group">
+        <label>Balancín (c): <span id="val-c">180</span> px</label>
+        <input type="range" id="sl-c" min="120" max="280" value="180" step="1">
+      </div>
+
+      <div class="control-group">
+        <label>Velocidad de Giro: <span id="val-rpm">1</span></label>
+        <input type="range" id="sl-rpm" min="0" max="4" value="1" step="0.2">
+      </div>
+
+      <div id="panel-alerta" class="alerta-grashof">
+        No cumple Grashof (No rotará continuo)
+      </div>
+
+      <div class="control-group" style="margin-top: 5px;">
+        <button id="btn-play-pause" style="width: 100%; padding: 12px; background-color: #ef4444; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer; transition: background 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+          Pausar Animación
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const linkManivela = document.getElementById('link-manivela');
+    const linkBalancin = document.getElementById('link-balancin');
+    const linkAcoplador = document.getElementById('link-acoplador');
+    
+    const lineaBancada = document.getElementById('linea-bancada');
+    const bancadaO4 = document.getElementById('bancada-o4');
+    
+    const pivoteO2 = document.getElementById('pivote-o2');
+    const pivoteO4 = document.getElementById('pivote-o4');
+    const pivoteA = document.getElementById('pivote-a');
+    const pivoteB = document.getElementById('pivote-b');
+
+    const slA = document.getElementById('sl-a');
+    const slB = document.getElementById('sl-b');
+    const slC = document.getElementById('sl-c');
+    const slD = document.getElementById('sl-d');
+    const slRpm = document.getElementById('sl-rpm');
+    const btnPlayPause = document.getElementById('btn-play-pause');
+    const panelAlerta = document.getElementById('panel-alerta');
+
+    const valA = document.getElementById('val-a');
+    const valB = document.getElementById('val-b');
+    const valC = document.getElementById('val-c');
+    const valD = document.getElementById('val-d');
+    const valRpm = document.getElementById('val-rpm');
+    
+    const txtAngulo = document.getElementById('txt-angulo');
+    const txtTrans = document.getElementById('txt-trans');
+    const txtFuerza = document.getElementById('txt-fuerza');
+
+    // Origen absoluto del pivote O2 fijo
+    const x0 = 250;  
+    const y0 = 320;  
+    
+    let theta2 = 0;   
+    let ejecutando = true;
+
+    function actualizarMecanismo() {
+      if (!ejecutando) return;
+
+      let a = parseFloat(slA.value); 
+      let b = parseFloat(slB.value); 
+      let c = parseFloat(slC.value); 
+      let d = parseFloat(slD.value); 
+      let velocidad = parseFloat(slRpm.value);
+
+      valA.textContent = a;
+      valB.textContent = b;
+      valC.textContent = c;
+      valD.textContent = d;
+      valRpm.textContent = velocidad === 0 ? "PAUSA" : velocidad;
+
+      // Validación Grashof
+      let eslabones = [a, b, c, d];
+      eslabones.sort((x, y) => x - y);
+      let S = eslabones[0];
+      let L = eslabones[3];
+      let P = eslabones[1];
+      let Q = eslabones[2];
+
+      if (a !== S || (S + L > P + Q)) {
+        panelAlerta.style.display = "block";
+        if (b < a + d - c) {
+          b = Math.ceil(a + d - c) + 5;
+          slB.value = b;
+          valB.textContent = b;
+        }
+      } else {
+        panelAlerta.style.display = "none";
+      }
+
+      theta2 = (theta2 + velocidad) % 360;
+      let rad2 = theta2 * (Math.PI / 180);
+
+      // CORRECCIÓN REQUISITO RIGIDEZ: Punto A calculado en función directa del pivote estático x0, y0
+      let ax = x0 + a * Math.cos(rad2);
+      let ay = y0 - a * Math.sin(rad2); 
+
+      let o4x = x0 + d;
+      let o4y = y0;
+
+      let dx = o4x - ax;
+      let dy = o4y - ay;
+      let F = Math.sqrt(dx * dx + dy * dy);
+
+      if (F > b + c || F < Math.abs(b - c)) {
+        b = F - c + 10;
+        slB.value = Math.floor(b);
+        valB.textContent = Math.floor(b);
+      }
+
+      let alpha = Math.atan2(y0 - ay, o4x - ax);
+      let cosBeta = (F * F + c * c - b * b) / (2 * F * c);
+      cosBeta = Math.max(-1, Math.min(1, cosBeta));
+      let beta = Math.acos(cosBeta);
+
+      let rad4 = alpha + beta;
+      
+      let bx = o4x - c * Math.cos(rad4);
+      let by = o4y - c * Math.sin(rad4);
+
+      // Actualización síncrona de la geometría SVG
+      lineaBancada.setAttribute('x1', x0);
+      lineaBancada.setAttribute('y1', y0);
+      lineaBancada.setAttribute('x2', o4x);
+      lineaBancada.setAttribute('y2', o4y);
+      
+      bancadaO4.setAttribute('cx', o4x);
+      pivoteO4.setAttribute('cx', o4x);
+
+      // CORRECCIÓN DE LA MANIVELA ROJA: Forzar x1,y1 constantes al centro del cigüeñal
+      linkManivela.setAttribute('x1', x0);
+      linkManivela.setAttribute('y1', y0);
+      linkManivela.setAttribute('x2', ax);
+      linkManivela.setAttribute('y2', ay);
+      pivoteA.setAttribute('cx', ax);
+      pivoteA.setAttribute('cy', ay);
+
+      // Balancín Verde
+      linkBalancin.setAttribute('x1', o4x);
+      linkBalancin.setAttribute('y1', o4y);
+      linkBalancin.setAttribute('x2', bx);
+      linkBalancin.setAttribute('y2', by);
+      pivoteB.setAttribute('cx', bx);
+      pivoteB.setAttribute('cy', by);
+
+      // Acoplador Azul
+      linkAcoplador.setAttribute('x1', ax);
+      linkAcoplador.setAttribute('y1', ay);
+      linkAcoplador.setAttribute('x2', bx);
+      linkAcoplador.setAttribute('y2', by);
+
+      // Telemetría
+      let theta4Grad = Math.abs(rad4 * (180 / Math.PI)) % 360;
+      let cosGamma = (b * b + c * c - F * F) / (2 * b * c);
+      cosGamma = Math.max(-1, Math.min(1, cosGamma));
+      let anguloTransmision = Math.acos(cosGamma) * (180 / Math.PI);
+
+      txtAngulo.textContent = Math.floor(theta2);
+      txtTrans.textContent = theta4Grad.toFixed(1);
+      txtFuerza.textContent = anguloTransmision.toFixed(1);
+
+      requestAnimationFrame(actualizarMecanismo);
+    }
+
+    btnPlayPause.addEventListener('click', () => {
+      ejecutando = !ejecutando;
+
+      if (ejecutando) {
+        btnPlayPause.textContent = "Pausar Animación";
+        btnPlayPause.style.backgroundColor = "#ef4444";
+        actualizarMecanismo();
+      } else {
+        btnPlayPause.textContent = "Iniciar Animación";
+        btnPlayPause.style.backgroundColor = "#10b981";
+      }
+    });
+
+    actualizarMecanismo();
+  </script>
+</body>
+</html>

@@ -1,0 +1,631 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Línea de Tiempo: Historia de la Termodinámica</title>
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0b0e1a 0%, #1a1f2f 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .timeline-container {
+            max-width: 1000px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(2px);
+            border-radius: 48px;
+            padding: 2rem 1.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        h1 {
+            text-align: center;
+            font-weight: 300;
+            letter-spacing: 2px;
+            color: #f0eae0;
+            margin-bottom: 0.25rem;
+            font-size: 2.2rem;
+            text-shadow: 0 2px 10px rgba(255, 180, 50, 0.2);
+        }
+
+        .subhead {
+            text-align: center;
+            color: #a8b2c9;
+            font-weight: 300;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(255, 215, 100, 0.15);
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .subhead i {
+            color: #f5b342;
+            font-size: 1.2rem;
+        }
+
+        /* ===== LÍNEA DE TIEMPO ===== */
+        .timeline {
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        /* Línea vertical central */
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, #f5b342, #d4782a, #a8551e, #7a3b14);
+            transform: translateX(-50%);
+            border-radius: 4px;
+            box-shadow: 0 0 15px #f5b34255;
+        }
+
+        /* ===== TARJETA (item) ===== */
+        .timeline-item {
+            display: flex;
+            justify-content: flex-end;
+            padding-right: 30px;
+            position: relative;
+            margin-bottom: 3rem;
+            opacity: 0;
+            transform: translateY(40px);
+            animation: fadeUp 0.8s ease forwards;
+        }
+
+        .timeline-item:nth-child(odd) {
+            justify-content: flex-start;
+            padding-right: 0;
+            padding-left: 30px;
+        }
+
+        /* Punto en la línea */
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 18px;
+            width: 18px;
+            height: 18px;
+            background: radial-gradient(circle at 30% 30%, #facc15, #e07c2e);
+            border: 3px solid #1a1f2f;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            box-shadow: 0 0 0 6px rgba(245, 180, 65, 0.25), 0 0 20px #f5b34277;
+            transition: 0.3s;
+        }
+
+        .timeline-item:hover::before {
+            box-shadow: 0 0 0 10px rgba(245, 180, 65, 0.4), 0 0 40px #f5b342;
+            transform: translateX(-50%) scale(1.1);
+        }
+
+        /* ===== TARJETA ===== */
+        .card {
+            width: 80%;
+            max-width: 420px;
+            background: rgba(26, 34, 50, 0.75);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 215, 100, 0.15);
+            border-radius: 28px;
+            padding: 1.5rem 1.8rem;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            transition: all 0.25s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: scale(1.02) translateY(-6px);
+            border-color: #f5b342aa;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(245, 180, 65, 0.15);
+            background: rgba(32, 40, 60, 0.85);
+        }
+
+        /* Borde decorativo superior */
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #f5b342, #d4782a, transparent);
+            opacity: 0.6;
+        }
+
+        /* ===== NUEVO: ESPACIO PARA IMAGEN ===== */
+        .card-image {
+            width: 100%;
+            height: 120px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            margin: 0.6rem 0 0.8rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px dashed rgba(255, 215, 100, 0.25);
+            overflow: hidden;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Placeholder visual para que sepas dónde va la imagen */
+        .card-image .placeholder-icon {
+            color: #6a7494;
+            font-size: 2.2rem;
+            opacity: 0.5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .card-image .placeholder-icon span {
+            font-size: 0.6rem;
+            letter-spacing: 1px;
+            opacity: 0.6;
+        }
+
+        .card:hover .card-image {
+            border-color: #f5b34266;
+        }
+
+        /* Año */
+        .year {
+            display: inline-block;
+            background: linear-gradient(135deg, #f5b342, #d4782a);
+            color: #0b0e1a;
+            font-weight: 700;
+            padding: 0.2rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.7rem;
+            box-shadow: 0 4px 12px rgba(245, 180, 65, 0.3);
+        }
+
+        .card h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #f0eae0;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h3 i {
+            color: #f5b342;
+            font-size: 1.2rem;
+            width: 1.8rem;
+        }
+
+        .card .científicos {
+            color: #bcc7e0;
+            font-weight: 400;
+            font-size: 0.95rem;
+            margin-bottom: 0.6rem;
+            border-left: 3px solid #f5b342;
+            padding-left: 12px;
+            background: rgba(245, 180, 65, 0.04);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .card .desc {
+            color: #c8d0e6;
+            font-weight: 300;
+            line-height: 1.5;
+            font-size: 0.95rem;
+            margin-bottom: 0.3rem;
+        }
+
+        /* ===== ACORDEÓN (expandible) ===== */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease, margin 0.3s;
+            opacity: 0;
+            margin-top: 0;
+        }
+
+        .card.active .accordion-content {
+            max-height: 400px;
+            opacity: 1;
+            margin-top: 1rem;
+        }
+
+        .accordion-content p {
+            background: rgba(0, 0, 0, 0.25);
+            padding: 0.9rem 1.2rem;
+            border-radius: 18px;
+            border-left: 3px solid #f5b342;
+            color: #d3dcee;
+            font-size: 0.92rem;
+            line-height: 1.6;
+            backdrop-filter: blur(4px);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+        }
+
+        .accordion-content i {
+            color: #f5b342;
+            margin-right: 8px;
+        }
+
+        /* Indicador de acordeón (flecha) */
+        .toggle-icon {
+            position: absolute;
+            bottom: 1rem;
+            right: 1.5rem;
+            color: #f5b342aa;
+            font-size: 1.1rem;
+            transition: transform 0.4s ease;
+            background: rgba(0,0,0,0.2);
+            padding: 0.2rem 0.6rem;
+            border-radius: 30px;
+            backdrop-filter: blur(2px);
+        }
+
+        .card.active .toggle-icon {
+            transform: rotate(180deg);
+            color: #f5b342;
+        }
+
+        /* ===== ANIMACIONES ===== */
+        @keyframes fadeUp {
+            0% { opacity: 0; transform: translateY(40px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Retrasos escalonados */
+        .timeline-item:nth-child(1) { animation-delay: 0.1s; }
+        .timeline-item:nth-child(2) { animation-delay: 0.2s; }
+        .timeline-item:nth-child(3) { animation-delay: 0.3s; }
+        .timeline-item:nth-child(4) { animation-delay: 0.4s; }
+        .timeline-item:nth-child(5) { animation-delay: 0.5s; }
+        .timeline-item:nth-child(6) { animation-delay: 0.6s; }
+        .timeline-item:nth-child(7) { animation-delay: 0.7s; }
+        .timeline-item:nth-child(8) { animation-delay: 0.8s; }
+        .timeline-item:nth-child(9) { animation-delay: 0.9s; }
+        .timeline-item:nth-child(10) { animation-delay: 1.0s; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 700px) {
+            .timeline::before {
+                left: 20px;
+            }
+
+            .timeline-item {
+                padding-left: 50px !important;
+                padding-right: 0 !important;
+                justify-content: flex-start !important;
+            }
+
+            .timeline-item::before {
+                left: 20px;
+            }
+
+            .card {
+                width: 100%;
+                max-width: 100%;
+                padding: 1.2rem;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            .card h3 {
+                font-size: 1.1rem;
+            }
+
+            .card-image {
+                height: 100px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .timeline-container {
+                padding: 1rem 0.8rem;
+            }
+            .card {
+                padding: 1rem;
+            }
+            .toggle-icon {
+                bottom: 0.6rem;
+                right: 1rem;
+                font-size: 0.9rem;
+            }
+            .card-image {
+                height: 80px;
+            }
+        }
+
+        /* scroll suave */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Pie de línea */
+        .timeline-footer {
+            text-align: center;
+            margin-top: 1rem;
+            color: #6a7494;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            opacity: 0.6;
+            border-top: 1px solid rgba(255, 215, 100, 0.05);
+            padding-top: 1.8rem;
+        }
+        .timeline-footer i {
+            color: #f5b342;
+        }
+    </style>
+</head>
+<body>
+    <div class="timeline-container">
+        <h1>⚡ Historia de la Termodinámica</h1>
+        <div class="subhead">
+            <i class="fas fa-fire"></i> Energía · Calor · Trabajo 
+            <i class="fas fa-arrow-right" style="color:#6a7494;"></i>
+            <span style="color:#bcc7e0;">Científicos y descubrimientos</span>
+        </div>
+
+        <div class="timeline">
+
+            <!-- ===== ITEM 1 ===== -->
+<div class="timeline-item">
+    <div class="card" onclick="toggleCard(this)">
+        <span class="year">~ 1650</span>
+        <h3><i class="fas fa-flask"></i> Física calórica</h3>
+        <div class="científicos"><i class="fas fa-user-graduate"></i> Robert Boyle · Otto von Guericke</div>
+        
+        <!-- ESPACIO PARA IMAGEN -->
+        <div class="imagen-container">
+            <img src="boyle.jpg" alt="Robert Boyle y Otto von Guericke" style="width:100%; border-radius: 8px; margin: 10px 0;">
+        </div>
+        
+        <div class="desc">Primeras aproximaciones al vacío y la presión. Boyle relaciona presión y volumen (ley de Boyle).</div>
+        <div class="accordion-content">
+            <p><i class="fas fa-lightbulb"></i> Boyle demostró que el aire tiene peso y elasticidad. Guericke inventó la bomba de vacío y los hemisferios de Magdeburgo, sentando las bases para entender la presión atmosférica y el comportamiento de los gases.</p>
+        </div>
+        <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+    </div>
+</div>
+          <!-- ===== ITEM 2 ===== -->
+<div class="timeline-item">
+    <div class="card" onclick="toggleCard(this)">
+        <span class="year">1738</span>
+        <h3><i class="fas fa-atom"></i> Teoría cinética</h3>
+        <div class="científicos"><i class="fas fa-user-graduate"></i> Daniel Bernoulli</div>
+        
+        <!-- ESPACIO PARA IMAGEN - CONTENEDOR MÁS GRANDE -->
+        <div class="card-image" style="padding: 0px; background: #f5f9fc; border-radius: 12px; margin: 15px 0; min-height: 300px; display: flex; align-items: center; justify-content: center;">
+            <img src="bernouli.jpg" alt="Daniel Bernoulli" style="width: 100%; height: auto; border-radius: 8px; display: block; object-fit: contain;">
+        </div>
+        
+        <div class="desc">Propone que los gases están formados por partículas en movimiento y que el calor es energía cinética.</div>
+        <div class="accordion-content">
+            <p><i class="fas fa-microscope"></i> En su obra <em>Hydrodynamica</em>, Bernoulli conecta la presión con los impactos de partículas, mucho antes de que se aceptara la teoría atómica. Fue el primer paso hacia la interpretación microscópica del calor.</p>
+        </div>
+        <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+    </div>
+</div>
+
+            <!-- ===== ITEM 3 ===== -->
+<div class="timeline-item">
+    <div class="card" onclick="toggleCard(this)">
+        <span class="year">1798</span>
+        <h3><i class="fas fa-cog"></i> Calor = movimiento</h3>
+        <div class="científicos"><i class="fas fa-user-graduate"></i> Benjamin Thompson (Conde Rumford)</div>
+        
+        <!-- ESPACIO PARA IMAGEN -->
+        <div class="card-image" style="margin: 0; background: #f5f9fc; border-radius: 12px; margin: 15px 0; min-height: 300px; display: flex; align-items: center; justify-content: center;">
+            <img src="Thompson.jpg" alt="Benjamin Thompson" style="width: 100%; height: auto; border-radius: 8px; display: block; object-fit: contain;">
+        </div>
+        
+        <div class="desc">Observa que al perforar cañones se genera calor ilimitado, refutando la teoría del calórico.</div>
+        <div class="accordion-content">
+            <p><i class="fas fa-fire"></i> Rumford notó que el calor producido por fricción era prácticamente inagotable. Concluyó que el calor debía ser una forma de movimiento, no un fluido (calórico). Su trabajo inspiró a Joule.</p>
+        </div>
+        <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+    </div>
+</div>
+
+            <!-- ===== ITEM 4 ===== -->
+            <div class="timeline-item">
+                <div class="card" onclick="toggleCard(this)">
+                    <span class="year">1824</span>
+                    <h3><i class="fas fa-microchip"></i> Máquina térmica ideal</h3>
+                    <div class="científicos"><i class="fas fa-user-graduate"></i> Sadi Carnot</div>
+                    <!-- ESPACIO PARA IMAGEN -->
+                    <div class="card-image" style="padding: 0px; background: #f5f9fc; border-radius: 12px; margin: 0px 0; min-height: 200px; display: flex; align-items: center; justify-content: center;">
+            <img src="carnot.jpg" alt="Sadi Carnot" style="width: 100%; height: auto; border-radius: 8px; display: block; object-fit: contain;">
+        </div>
+                    <div class="desc">Publica <em>Reflexiones sobre la potencia motriz del fuego</em>, base de la termodinámica moderna.</div>
+                    <div class="accordion-content">
+                        <p><i class="fas fa-chart-line"></i> Carnot establece que la eficiencia de una máquina térmica depende solo de las temperaturas entre las que opera, no del fluido. Introduce el ciclo de Carnot y sienta las bases de la segunda ley.</p>
+                    </div>
+                    <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                </div>
+            </div>
+
+            <!-- ===== ITEM 5 ===== -->
+            <div class="timeline-item">
+                <div class="card" onclick="toggleCard(this)">
+                    <span class="year">1843</span>
+                    <h3><i class="fas fa-bolt"></i> Equivalente mecánico del calor</h3>
+                    <div class="científicos"><i class="fas fa-user-graduate"></i> James Prescott Joule</div>
+                    <!-- ESPACIO PARA IMAGEN -->
+                    <div class="card-image" style="margin: 20px; background: #f5f9fc; border-radius: 12px; margin: 0px 0; min-height: 370px; display: flex; align-items: center; justify-content: center;">
+            <img src="joule.jpg" alt="James Prescott Joule" style="width: 100%; height: auto; border-radius: 8px; display: block; object-fit: contain;">
+        </div>
+                    <div class="desc">Determina la relación entre trabajo mecánico y calor (1 cal = 4.184 J).</div>
+                    <div class="accordion-content">
+                        <p><i class="fas fa-weight-scale"></i> Con su famoso experimento de la rueda de paletas, Joule midió el aumento de temperatura del agua al realizar trabajo. Demostró la equivalencia entre calor y trabajo, confirmando la primera ley de la termodinámica.</p>
+                    </div>
+                    <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                </div>
+            </div>
+
+            <!-- ===== ITEM 6 ===== -->
+            <div class="timeline-item">
+                <div class="card" onclick="toggleCard(this)">
+                    <span class="year">1850</span>
+                    <h3><i class="fas fa-arrows-spin"></i> Primera y segunda ley</h3>
+                    <div class="científicos"><i class="fas fa-user-graduate"></i> Rudolf Clausius · William Thomson (Lord Kelvin)</div>
+                    <!-- ESPACIO PARA IMAGEN -->
+                    <div class="card-image" style="margin: 20px; background: #f5f9fc; border-radius: 12px; margin: 0px 0; min-height: 370px; display: flex; align-items: center; justify-content: center;">
+            <img src="clausius.jpg" alt="Rudolf Clausius" style="width: 100%; height: auto; border-radius: 8px; display: block; object-fit: contain;">
+        </div>
+                    <div class="desc">Formulación rigurosa de la primera ley (energía se conserva) y segunda ley (entropía).</div>
+                    <div class="accordion-content">
+                        <p><i class="fas fa-crown"></i> Clausius introduce el concepto de entropía y enuncia: <em>"La entropía del universo tiende a un máximo"</em>. Kelvin establece la escala absoluta de temperatura y el cero absoluto.</p>
+                    </div>
+                    <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                </div>
+            </div>
+
+            <!-- ===== ITEM 7 ===== -->
+            <div class="timeline-item">
+                <div class="card" onclick="toggleCard(this)">
+                    <span class="year">1871</span>
+                    <h3><i class="fas fa-cloud"></i> Mecánica estadística</h3>
+                    <div class="científicos"><i class="fas fa-user-graduate"></i> Ludwig Boltzmann · James Clerk Maxwell</div>
+                    <!-- ESPACIO PARA IMAGEN -->
+                    <div class="card-image" style="margin: 20px; background: #f5f9fc; border-radius: 12px; margin: 0px 0; min-height: 370px; display: flex; align-items: center; justify-content: center;">
+            <img src="boltzman.jpg" alt="Ludwing Boltzmann" style="width: 100%; height: auto; border-radius: 8px; display: block; object-fit: contain;">
+        </div>
+                    <div class="desc">Interpretación estadística de la entropía y distribución de velocidades moleculares.</div>
+                    <div class="accordion-content">
+                        <p><i class="fas fa-cubes"></i> Boltzmann relaciona la entropía con el desorden molecular (S = k·ln W). Maxwell desarrolla la teoría cinética de gases. Ambos unifican la termodinámica con la mecánica y la probabilidad.</p>
+                    </div>
+                    <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                </div>
+            </div>
+
+            <!-- ===== ITEM 8 ===== -->
+            <div class="timeline-item">
+                <div class="card" onclick="toggleCard(this)">
+                    <span class="year">1905</span>
+                    <h3><i class="fas fa-square-root-variable"></i> Movimiento browniano</h3>
+                    <div class="científicos"><i class="fas fa-user-graduate"></i> Albert Einstein</div>
+                    <!-- ESPACIO PARA IMAGEN -->
+                    <div class="card-image" style="margin: 20px; background: #f5f9fc; border-radius: 12px; margin: 0px 0; min-height: 370px; display: flex; align-items: center; justify-content: center;">
+            <img src="einstein.jpg" alt="ALbert Einstein" style="width: 100%; height: auto; border-radius: 8px; display: block; object-fit: contain;">
+        </div>
+                    <div class="desc">Explica el movimiento caótico de partículas, confirmando la existencia de los átomos.</div>
+                    <div class="accordion-content">
+                        <p><i class="fas fa-flask"></i> Einstein publica su teoría sobre el movimiento browniano, proporcionando evidencia empírica de la teoría cinético-molecular. Esto consolidó la interpretación atómica del calor y la energía.</p>
+                    </div>
+                    <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                </div>
+            </div>
+
+            <!-- ===== ITEM 9 ===== -->
+            <div class="timeline-item">
+                <div class="card" onclick="toggleCard(this)">
+                    <span class="year">1948</span>
+                    <h3><i class="fas fa-bolt"></i> Termodinámica de no equilibrio</h3>
+                    <div class="científicos"><i class="fas fa-user-graduate"></i> Lars Onsager · Ilya Prigogine</div>
+                    <!-- ESPACIO PARA IMAGEN -->
+                    <div class="card-image" style="margin: 20px; background: #f5f9fc; border-radius: 12px; margin: 0px 0; min-height: 370px; display: flex; align-items: center; justify-content: center;">
+            <img src="lars.jpg" alt="Lars Onsager" style="width: 100%; height: auto; border-radius: 8px; display: block; object-fit: contain;">
+        </div>
+                    <div class="desc">Relaciones de reciprocidad y estructuras disipativas lejos del equilibrio.</div>
+                    <div class="accordion-content">
+                        <p><i class="fas fa-sync"></i> Onsager (Nobel 1968) establece relaciones para procesos irreversibles. Prigogine (Nobel 1977) introduce las estructuras disipativas, aplicando la termodinámica a sistemas vivos y complejos.</p>
+                    </div>
+                    <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                </div>
+            </div>
+
+            <!-- ===== ITEM 10 ===== -->
+            <div class="timeline-item">
+                <div class="card" onclick="toggleCard(this)">
+                    <span class="year">Actualidad</span>
+                    <h3><i class="fas fa-microchip"></i> Termodinámica cuántica</h3>
+                    <div class="científicos"><i class="fas fa-user-graduate"></i> Física moderna · Información y energía</div>
+                    <!-- ESPACIO PARA IMAGEN -->
+                    <div class="card-image" style="margin: 20px; background: #f5f9fc; border-radius: 12px; margin: 0px 0; min-height: 370px; display: flex; align-items: center; justify-content: center;">
+            <img src="Rolf_Landauer.jpg" alt="Rolf Laundauer" style="width: 100%; height: auto; border-radius: 8px; display: block; object-fit: contain;">
+        </div>
+                    <div class="desc">Motores cuánticos, refrigeradores de un solo átomo, relación entre información y entropía.</div>
+                    <div class="accordion-content">
+                        <p><i class="fas fa-quantum"></i> Hoy la termodinámica se extiende al régimen cuántico, explorando límites fundamentales de la computación, la eficiencia energética a nanoescala y la conexión con la teoría de la información (principio de Landauer).</p>
+                    </div>
+                    <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                </div>
+            </div>
+
+        </div> <!-- /timeline -->
+
+        <div class="timeline-footer">
+            <i class="fas fa-arrow-trend-up"></i> De Boyle a la termodinámica cuántica · Haz clic en cada tarjeta para más detalles
+        </div>
+    </div>
+
+    <script>
+        // Función para alternar el acordeón al hacer clic en la tarjeta
+        function toggleCard(cardElement) {
+            const isActive = cardElement.classList.contains('active');
+            
+            document.querySelectorAll('.card').forEach(c => {
+                c.classList.remove('active');
+            });
+
+            if (!isActive) {
+                cardElement.classList.add('active');
+            }
+        }
+
+        document.querySelectorAll('.toggle-icon, .card').forEach(el => {
+            el.addEventListener('click', function(e) {
+                const card = this.closest('.card');
+                if (card) {
+                    toggleCard(card);
+                }
+            });
+        });
+
+        window.addEventListener('load', function() {
+            const firstCard = document.querySelector('.card');
+            if (firstCard) {
+                firstCard.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

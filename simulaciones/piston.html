@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulador Interactivo: Biela-Manivela Modo Oscuro</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      /* Fondo general con degradado azul oscuro profundo */
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    h1 { 
+      color: #f8fafc; 
+      margin-bottom: 15px; 
+      font-size: 26px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+    
+    /* Contenedor principal translúcido para integrarse al fondo */
+    .contenedor {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      background: rgba(30, 41, 59, 0.7);
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      max-width: 1100px;
+      width: 100%;
+    }
+    
+    /* Área del gráfico SVG */
+    .area-grafica { flex: 1; min-width: 500px; }
+    /* Ajuste del lienzo SVG para modo oscuro */
+    svg { 
+      width: 100%; 
+      height: auto; 
+      border: 1px solid #334155; 
+      border-radius: 12px; 
+      background: #090d16; /* Fondo interno del lienzo muy oscuro */
+    }
+
+    /* Panel de controles laterales ajustado a tonos oscuros */
+    .panel-controles {
+      width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #334155;
+    }
+    .control-group { display: flex; flex-direction: column; gap: 8px; }
+    /* Texto de etiquetas cambiado a gris claro/blanco para alto contraste */
+    label { font-size: 13px; font-weight: bold; color: #cbd5e1; display: flex; justify-content: space-between; }
+    label span { color: #38bdf8; font-family: monospace; font-size: 14px; }
+    input[type="range"] { width: 100%; cursor: pointer; accent-color: #38bdf8; }
+
+    /* Clases de Estilo Estructurales para el SVG */
+    .bloque-motor { fill: #475569; stroke: #64748b; stroke-width: 2; }
+    .manivela { stroke: #f43f5e; stroke-width: 8; stroke-linecap: round; } /* Ajuste de color para resaltar */
+    .biela { stroke: #38bdf8; stroke-width: 6; stroke-linecap: round; }    /* Azul brillante cyan */
+    .piston { fill: #10b981; stroke: #059669; stroke-width: 2; }           /* Verde esmeralda */
+    .perno { fill: #ffffff; stroke: #0f172a; stroke-width: 3; }
+  </style>
+</head>
+<body>
+
+  <h1>Simulador Cinemático Interactivo</h1>
+
+  <div class="contenedor">
+    
+    <div class="area-grafica">
+      <svg viewBox="0 0 800 500">
+        <line id="linea-centro" x1="100" y1="250" x2="750" y2="250" stroke="#475569" stroke-width="1" stroke-dasharray="8,8" />
+        
+        <rect id="camisa-superior" x="200" y="200" width="400" height="20" rx="4" class="bloque-motor" />
+        <rect id="camisa-inferior" x="200" y="280" width="400" height="20" rx="4" class="bloque-motor" />
+        
+        <circle cx="200" cy="250" r="12" fill="#334155" stroke="#64748b" stroke-width="2" />
+
+        <g id="grupo-manivela">
+          <line id="linea-m" x1="200" y1="250" x2="280" y2="250" class="manivela" />
+          <circle id="perno-m" cx="280" cy="250" r="5" class="perno" />
+        </g>
+        
+        <g id="grupo-biela">
+          <line id="linea-b" x1="280" y1="250" x2="460" y2="250" class="biela" />
+        </g>
+        
+        <g id="grupo-piston">
+          <rect x="-35" y="-30" width="70" height="60" rx="6" class="piston" />
+          <circle cx="0" cy="0" r="5" class="perno" />
+        </g>
+
+        <g id="panel-variables" transform="translate(20, 20)">
+          <rect x="0" y="0" width="240" height="140" rx="8" fill="#1e293b" opacity="0.9" stroke="#334155" stroke-width="2" />
+          <text x="15" y="25" fill="#f8fafc" font-family="monospace" font-size="13" font-weight="bold" letter-spacing="1">TELEMETRÍA DINÁMICA</text>
+          <line x1="15" y1="32" x2="225" y2="32" stroke="#334155" stroke-width="1.5" />
+          
+          <text x="15" y="60" fill="#34d399" font-family="monospace" font-size="14" font-weight="bold">Ángulo Motor: <tspan id="txt-angulo">0</tspan>°</text>
+          <text x="15" y="85" fill="#38bdf8" font-family="monospace" font-size="14" font-weight="bold">Posición (x): <tspan id="txt-posicion">0.0</tspan> mm</text>
+          <text x="15" y="110" fill="#fbbf24" font-family="monospace" font-size="14" font-weight="bold">Fuerza Gas:   <tspan id="txt-fuerza">0.0</tspan> N</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="panel-controles">
+      <h3 style="margin-top:0; color:#f8fafc; font-size:16px; border-bottom:2px solid #38bdf8; padding-bottom:5px;">Configuración</h3>
+      
+      <div class="control-group">
+        <label>Radio Manivela (r): <span id="val-r">80</span> px</label>
+        <input type="range" id="sl-r" min="40" max="100" value="80" step="1">
+      </div>
+
+      <div class="control-group">
+        <label>Largo Biela (l): <span id="val-l">180</span> px</label>
+        <input type="range" id="sl-l" min="120" max="250" value="180" step="1">
+      </div>
+
+      <div class="control-group">
+        <label>Velocidad de Giro: <span id="val-rpm">1</span></label>
+        <input type="range" id="sl-rpm" min="0" max="5" value="1" step="0.5">
+      </div>
+
+      <div class="control-group" style="margin-top: 5px;">
+        <button id="btn-play-pause" style="width: 100%; padding: 12px; background-color: #ef4444; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer; transition: background 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+          Pausar Animación
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const lineaM = document.getElementById('linea-m');
+    const pernoM = document.getElementById('perno-m');
+    const lineaB = document.getElementById('linea-b');
+    const piston = document.getElementById('grupo-piston');
+    
+    const camisaSup = document.getElementById('camisa-superior');
+    const camisaInf = document.getElementById('camisa-inferior');
+    const lineaCentro = document.getElementById('linea-centro');
+
+    const slR = document.getElementById('sl-r');
+    const slL = document.getElementById('sl-l');
+    const slRpm = document.getElementById('sl-rpm');
+    const btnPlayPause = document.getElementById('btn-play-pause');
+
+    const valR = document.getElementById('val-r');
+    const valL = document.getElementById('val-l');
+    const valRpm = document.getElementById('val-rpm');
+    const txtAngulo = document.getElementById('txt-angulo');
+    const txtPosicion = document.getElementById('txt-posicion');
+    const txtFuerza = document.getElementById('txt-fuerza');
+
+    const x0 = 200;  
+    const y0 = 250;  
+    let angulo = 0;  
+    let ejecutando = true; 
+
+    function actualizarMecanismo() {
+      if (!ejecutando) return;
+
+      let r = parseFloat(slR.value);
+      let l = parseFloat(slL.value);
+      let velocidad = parseFloat(slRpm.value);
+
+      valR.textContent = r;
+      valL.textContent = l;
+      valRpm.textContent = velocidad === 0 ? "PAUSA" : velocidad;
+
+      if (l <= r + 15) {
+        l = r + 15;
+        slL.value = l;
+        valL.textContent = l;
+      }
+
+      angulo = (angulo + velocidad) % 360;
+      let radianes = angulo * (Math.PI / 180);
+
+      let bx = x0 + r * Math.cos(radianes);
+      let by = y0 + r * Math.sin(radianes);
+      let posicionPistonX = x0 + r * Math.cos(radianes) + Math.sqrt(Math.pow(l, 2) - Math.pow(r * Math.sin(radianes), 2));
+
+      let xMin = x0 + (l - r) - 40; 
+      let xMax = x0 + (l + r) + 40; 
+      let anchoCilindro = xMax - xMin;
+
+      camisaSup.setAttribute('x', xMin);
+      camisaSup.setAttribute('width', anchoCilindro);
+      camisaInf.setAttribute('x', xMin);
+      camisaInf.setAttribute('width', anchoCilindro);
+      lineaCentro.setAttribute('x1', xMin);
+      lineaCentro.setAttribute('x2', xMax);
+
+      lineaM.setAttribute('x1', x0);
+      lineaM.setAttribute('y1', y0);
+      lineaM.setAttribute('x2', bx);
+      lineaM.setAttribute('y2', by);
+      pernoM.setAttribute('cx', bx);
+      pernoM.setAttribute('cy', by);
+      
+      lineaB.setAttribute('x1', bx);
+      lineaB.setAttribute('y1', by);
+      lineaB.setAttribute('x2', posicionPistonX);
+      lineaB.setAttribute('y2', y0);
+
+      piston.setAttribute('transform', `translate(${posicionPistonX}, ${y0})`);
+
+      let xMinReal = x0 + (l - r); 
+      let posicionEnMm = (posicionPistonX - xMinReal); 
+      let fuerzaSimulada = posicionEnMm <= 0 ? 0 : 40 + (6000 / (posicionEnMm + 12));
+
+      txtAngulo.textContent = Math.floor(angulo);
+      txtPosicion.textContent = posicionEnMm.toFixed(1);
+      txtFuerza.textContent = velocidad === 0 ? "0.0" : fuerzaSimulada.toFixed(1);
+
+      requestAnimationFrame(actualizarMecanismo);
+    }
+
+    btnPlayPause.addEventListener('click', () => {
+      ejecutando = !ejecutando;
+
+      if (ejecutando) {
+        btnPlayPause.textContent = "Pausar Animación";
+        btnPlayPause.style.backgroundColor = "#ef4444";
+        actualizarMecanismo();
+      } else {
+        btnPlayPause.textContent = "Iniciar Animación";
+        btnPlayPause.style.backgroundColor = "#10b981";
+      }
+    });
+
+    actualizarMecanismo();
+  </script>
+</body>
+</html>
